@@ -1,0 +1,58 @@
+@baseUrl = http://localhost:5000
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... // Replace with actual token
+
+### Get all collections
+GET {{baseUrl}}/api/collections
+
+### Get collection by ID
+GET {{baseUrl}}/api/collections/65082b1e1234567890abcdef
+
+### Create new collection (requires admin auth)
+POST {{baseUrl}}/api/collections
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Summer Collection 2025",
+  "description": "Elegant designs for summer season",
+  "image": "https://example.com/summer.jpg",
+  "banner": "https://example.com/summer-banner.jpg",
+  "isActive": true,
+  "isFeatured": true,
+  "displayOrder": 1,
+  "startDate": "2025-06-01T00:00:00.000Z",
+  "endDate": "2025-08-31T23:59:59.999Z",
+  "metadata": {
+    "seoTitle": "Summer Collection 2025 - GCG",
+    "seoDescription": "Discover our elegant summer designs",
+    "keywords": ["summer", "fashion", "elegant", "2025"]
+  }
+}
+
+### Update collection (requires admin auth)
+PUT {{baseUrl}}/api/collections/65082b1e1234567890abcdef
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Summer Collection 2025 Updated",
+  "description": "Updated elegant designs for summer season",
+  "isFeatured": false
+}
+
+### Add product to collection (requires admin auth)
+POST {{baseUrl}}/api/collections/65082b1e1234567890abcdef/products
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "productId": "65082b1e1234567890abcdef"
+}
+
+### Remove product from collection (requires admin auth)
+DELETE {{baseUrl}}/api/collections/65082b1e1234567890abcdef/products/65082b1e1234567890abcdef
+Authorization: Bearer {{authToken}}
+
+### Delete collection (requires admin auth)
+DELETE {{baseUrl}}/api/collections/65082b1e1234567890abcdef
+Authorization: Bearer {{authToken}}
