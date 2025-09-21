@@ -378,5 +378,13 @@ For support and questions:
 - **Issues**: [GitHub Issues](https://github.com/your-username/gcg-test-inv/issues)
 
 ---
+## Preview
+<img width="1920" height="2874" alt="screencapture-localhost-5173-collections-2025-09-21-12_10_58" src="https://github.com/user-attachments/assets/c871264b-5ede-473c-84e9-1591cd0e7f53" />
+<img width="1920" height="2362" alt="screencapture-localhost-5173-2025-09-21-12_08_50" src="https://github.com/user-attachments/assets/da6dbc26-535b-4bfa-a064-4beaaa0bc3e1" />
+<img width="1920" height="1431" alt="screencapture-localhost-5173-product-68ccfeae0a1ff1acdad04b63-2025-09-21-12_18_43" src="https://github.com/user-attachments/assets/2f6d8266-2573-42df-9140-8e79251de489" />
+<img width="1920" height="1431" alt="screencapture-localhost-5173-product-68ccfeae0a1ff1acdad04b63-2025-09-21-12_19_25" src="https://github.com/user-attachments/assets/1acfbd64-90ee-4f8e-914a-19c28e590f53" />
+<img width="1920" height="826" alt="screencapture-localhost-5173-admin-2025-09-21-12_37_45" src="https://github.com/user-attachments/assets/595e99cf-34ef-49a4-bf38-632c551268f0" />
+
+
 
 **GCG Luxury Eyewear** - Crafting exceptional digital experiences for luxury eyewear.
