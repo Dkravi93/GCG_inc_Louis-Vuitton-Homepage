@@ -280,7 +280,7 @@ export default function AdminPage() {
   });
 
   const Navigation = () => (
-    <nav className="flex space-x-8 border-b border-white/10 mb-8">
+    <nav className="flex space-x-8 border-b mb-8">
       {[
         { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
         { id: 'products', label: 'Products', icon: Package },
@@ -293,10 +293,10 @@ export default function AdminPage() {
           <button
             key={item.id}
             onClick={() => setCurrentView(item.id as View)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            className={`flex rounded items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
               currentView === item.id
-                ? 'border-white text-white'
-                : 'border-transparent text-white/60 hover:text-white'
+                ? 'border-neutral-800 bg-neutral-500'
+                : 'border-transparent  hover:border-neutral-800'
             }`}
           >
             <Icon className="h-4 w-4" />
@@ -314,40 +314,40 @@ export default function AdminPage() {
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60">Total Products</p>
-              <p className="text-3xl font-light text-white">{stats.totalProducts}</p>
+              <p className="text-sm ">Total Products</p>
+              <p className="text-3xl font-light ">{stats.totalProducts}</p>
             </div>
-            <Package className="h-8 w-8 text-white/40" />
+            <Package className="h-8 w-8 " />
           </div>
         </div>
         
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60">Total Orders</p>
-              <p className="text-3xl font-light text-white">{stats.totalOrders}</p>
+              <p className="text-sm ">Total Orders</p>
+              <p className="text-3xl font-light ">{stats.totalOrders}</p>
             </div>
-            <Clock className="h-8 w-8 text-white/40" />
+            <Clock className="h-8 w-8 " />
           </div>
         </div>
         
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 dark:text-white/60">Total Revenue</p>
-              <p className="text-3xl font-light text-black dark:text-white">${stats.totalRevenue.toLocaleString()}</p>
+              <p className="text-sm">Total Revenue</p>
+              <p className="text-3xl font-light text-black">${stats.totalRevenue.toLocaleString()}</p>
             </div>
-            <DollarSign className="h-8 w-8 text-black/40 dark:text-white/40" />
+            <DollarSign className="h-8 w-8" />
           </div>
         </div>
         
-        <div className="rounded-2xl border dark:border-white/10 bg-white/5 border-white/10 dark:bg-black/5 p-6">
+        <div className="rounded-2xl border border-white/10 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60 dark:text-white/60">Total Users</p>
-              <p className="text-3xl font-light text-black dark:text-white">{stats.totalUsers}</p>
+              <p className="text-sm">Total Users</p>
+              <p className="text-3xl font-light text-black">{stats.totalUsers}</p>
             </div>
-            <Users className="h-8 w-8 text-white/40" />
+            <Users className="h-8 w-8 " />
           </div>
         </div>
       </div>
@@ -359,16 +359,16 @@ export default function AdminPage() {
           <div className="space-y-3">
             <button
               onClick={() => setProductModal('create')}
-              className="w-full flex items-center gap-3 p-3 rounded-lg text-dark dark:text-white hover:bg-white/20 transition-colors"
+              className="w-full border flex items-center gap-3 p-3 rounded-lg hover:bg-white/20 transition-colors"
             >
               <Plus className="h-5 w-5" />
               Create New Product
             </button>
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg text-dark dark:text-white hover:bg-white/20 transition-colors">
+            <button className="w-full border flex items-center gap-3 p-3 rounded-lg hover:bg-white/20 transition-colors">
               <Upload className="h-5 w-5" />
               Bulk Import Products
             </button>
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg text-dark dark:text-white hover:bg-white/20 transition-colors">
+            <button className="w-full border flex items-center gap-3 p-3 rounded-lg hover:bg-white/20 transition-colors">
               <TrendingUp className="h-5 w-5" />
               View Analytics
             </button>
@@ -380,18 +380,18 @@ export default function AdminPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
               <CheckCircle className="h-4 w-4 text-green-400" />
-              <span className="text-white/80">New product "Aviator Classic" created</span>
-              <span className="text-white/40 ml-auto">2h ago</span>
+              <span className="">New product "Aviator Classic" created</span>
+              <span className=" ml-auto">2h ago</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <AlertCircle className="h-4 w-4 text-yellow-400" />
-              <span className="text-white/80">Low stock alert for "Ray-Ban Wayfarer"</span>
-              <span className="text-white/40 ml-auto">4h ago</span>
+              <span className="">Low stock alert for "Ray-Ban Wayfarer"</span>
+              <span className=" ml-auto">4h ago</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <CheckCircle className="h-4 w-4 text-green-400" />
-              <span className="text-white/80">Order #GCG-1234 completed</span>
-              <span className="text-white/40 ml-auto">6h ago</span>
+              <span className="">Order #GCG-1234 completed</span>
+              <span className=" ml-auto">6h ago</span>
             </div>
           </div>
         </div>
@@ -405,7 +405,7 @@ export default function AdminPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-light">Products</h2>
-          <p className="text-white/60">Manage your product catalog</p>
+          <p className="">Manage your product catalog</p>
         </div>
         <button
           onClick={() => setProductModal('create')}
@@ -419,20 +419,20 @@ export default function AdminPage() {
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 " />
           <input
             type="text"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-white/20 text-dark dark:text-white py-2 pl-10 pr-4 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+            className="w-full rounded-lg border border-white/20 py-2 pl-10 pr-4 focus:border-white/40 focus:outline-none"
           />
         </div>
         
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="rounded-lg border border-white/20 text-dark dark:text-white px-4 py-2 text-white focus:border-white/40 focus:outline-none"
+          className="rounded-lg border border-white/20 px-4 py-2  focus:border-white/40 focus:outline-none"
         >
           <option value="all">All Categories</option>
           <option value="sunglasses">Sunglasses</option>
@@ -446,9 +446,9 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-6">
-              <div className="h-48 text-dark dark:text-white rounded-lg mb-4" />
-              <div className="h-4 text-dark dark:text-white rounded mb-2" />
-              <div className="h-6 text-dark dark:text-white rounded w-24" />
+              <div className="h-48 rounded-lg mb-4" />
+              <div className="h-4 rounded mb-2" />
+              <div className="h-6 rounded w-24" />
             </div>
           ))}
         </div>
@@ -459,7 +459,7 @@ export default function AdminPage() {
               key={product._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="group rounded-2xl border border-white/10 bg-white/5 p-6 hover:text-dark dark:text-white transition-colors"
+              className="group rounded-2xl border p-6 hover:text-dark transition-colors"
             >
               <div className="relative mb-4">
                 <img
@@ -495,9 +495,9 @@ export default function AdminPage() {
               </div>
               
               <div>
-                <h3 className="font-medium text-white mb-1">{product.name}</h3>
-                <p className="text-sm text-white/60 mb-2">{product.category}</p>
-                <p className="text-lg font-light text-white">${product.basePrice.toFixed(2)}</p>
+                <h3 className="font-medium  mb-1">{product.name}</h3>
+                <p className="text-sm  mb-2">{product.category}</p>
+                <p className="text-lg font-light ">${product.basePrice.toFixed(2)}</p>
                 <div className="mt-2 flex items-center gap-2 text-xs">
                   <span className={`px-2 py-1 rounded-full ${
                     product.hidden 
@@ -507,7 +507,7 @@ export default function AdminPage() {
                     {product.hidden ? 'Hidden' : 'Published'}
                   </span>
                   {product.variants && (
-                    <span className="text-white/60">
+                    <span className="">
                       {product.variants.length} variants
                     </span>
                   )}
@@ -528,22 +528,22 @@ export default function AdminPage() {
       case 'products':
         return <ProductsView />;
       case 'orders':
-        return <div className="text-center py-12"><p className="text-white/60">Orders management coming soon</p></div>;
+        return <div className="text-center py-12"><p className="">Orders management coming soon</p></div>;
       case 'analytics':
-        return <div className="text-center py-12"><p className="text-white/60">Analytics dashboard coming soon</p></div>;
+        return <div className="text-center py-12"><p className="">Analytics dashboard coming soon</p></div>;
       case 'settings':
-        return <div className="text-center py-12"><p className="text-white/60">Settings panel coming soon</p></div>;
+        return <div className="text-center py-12"><p className="">Settings panel coming soon</p></div>;
       default:
         return <Dashboard />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-8">
           <h1 className="text-4xl font-extralight mb-2">Admin Dashboard</h1>
-          <p className="text-white/60">Welcome back, {user?.firstName || 'Admin'}</p>
+          <p className="">Welcome back, {user?.firstName || 'Admin'}</p>
         </div>
 
         <Navigation />

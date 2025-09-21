@@ -139,7 +139,7 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <div className="max-h-screen bg-black text-white">
+      <div className="max-h-screen bg-black">
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="animate-pulse">
             <div className="mb-8">
@@ -169,11 +169,11 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">👓</div>
           <h2 className="text-2xl font-light mb-2">Product not found</h2>
-          <p className="text-white/60 mb-8">The product you're looking for doesn't exist.</p>
+          <p className=" mb-8">The product you're looking for doesn't exist.</p>
           <Link 
             to="/collections" 
             className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-full font-medium hover:bg-white/90 transition-colors"
@@ -194,10 +194,10 @@ export default function ProductPage() {
         image={images[0]?.url}
       />
       
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen">
         {/* Breadcrumb & Back Navigation */}
         <div className="mx-auto max-w-7xl px-6 py-8  mt-16">
-          <div className="flex items-center gap-4 text-sm text-white/60">
+          <div className="flex items-center gap-4 text-sm">
             <Link to="/collections" className="flex items-center gap-2 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Collections
@@ -205,7 +205,7 @@ export default function ProductPage() {
             <span>/</span>
             <span className="capitalize">{product.category}</span>
             <span>/</span>
-            <span className="text-white">{product.name}</span>
+            <span className="">{product.name}</span>
           </div>
         </div>
 
@@ -237,7 +237,7 @@ export default function ProductPage() {
                 {/* Product Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   {product.featured && (
-                    <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white border border-white/10">
+                    <div className="flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-medium border border-white/10">
                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                       Featured
                     </div>
@@ -248,7 +248,7 @@ export default function ProductPage() {
                     </div>
                   )}
                   {product.onSale && product.discount && (
-                    <div className="rounded-full bg-gradient-to-r from-red-500 to-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+                    <div className="rounded-full bg-gradient-to-r from-red-500 to-red-600 px-3 py-1.5 text-xs font-semibold shadow-lg">
                       -{product.discount.type === 'percentage' ? `${product.discount.value}%` : `$${product.discount.value}`}
                     </div>
                   )}
@@ -258,14 +258,14 @@ export default function ProductPage() {
                 <div className="absolute top-4 right-4 flex flex-col gap-3">
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className="rounded-full bg-black/60 backdrop-blur-sm p-3 text-white hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
+                    className="rounded-full bg-black/60 backdrop-blur-sm p-3 hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
                     aria-label="Add to wishlist"
                   >
                     <Heart className={`h-5 w-5 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
                   </button>
                   <button
                     onClick={handleShare}
-                    className="rounded-full bg-black/60 backdrop-blur-sm p-3 text-white hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
+                    className="rounded-full bg-black/60 backdrop-blur-sm p-3 hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
                     aria-label="Share product"
                   >
                     <Share2 className="h-5 w-5" />
@@ -300,14 +300,14 @@ export default function ProductPage() {
               {/* Brand & Title */}
               <div>
                 {product.brand && (
-                  <div className="text-sm text-white/50 uppercase tracking-[0.2em] font-light mb-3">
+                  <div className="text-sm uppercase tracking-[0.2em] font-light mb-3">
                     {product.brand}
                   </div>
                 )}
                 <h1 className="text-4xl md:text-5xl font-extralight leading-tight mb-4">
                   {product.name}
                 </h1>
-                <div className="text-white/70 capitalize tracking-wide">{product.category}</div>
+                <div className="capitalize tracking-wide">{product.category}</div>
               </div>
 
               {/* Price */}
@@ -315,7 +315,7 @@ export default function ProductPage() {
                 {product.onSale && product.discount ? (
                   <>
                     <span className="text-3xl font-extralight tracking-tight">${discountedPrice.toFixed(2)}</span>
-                    <span className="text-xl text-white/40 line-through font-light">${product.basePrice.toFixed(2)}</span>
+                    <span className="text-xl line-through font-light">${product.basePrice.toFixed(2)}</span>
                   </>
                 ) : (
                   <span className="text-3xl font-extralight tracking-tight">${product.basePrice.toFixed(2)}</span>
@@ -324,7 +324,7 @@ export default function ProductPage() {
 
               {/* Description */}
               {product.description && (
-                <div className="text-white/80 leading-relaxed">
+                <div className="leading-relaxed">
                   {product.description}
                 </div>
               )}
@@ -376,7 +376,7 @@ export default function ProductPage() {
                     </button>
                   </div>
                   {selectedVariant && (
-                    <div className="text-sm text-white/60">
+                    <div className="text-sm">
                       {selectedVariant.stock} in stock
                     </div>
                   )}
@@ -388,7 +388,7 @@ export default function ProductPage() {
                 <button
                   onClick={handleAddToCart}
                   disabled={!inStock}
-                  className="w-full flex items-center justify-center gap-3 bg-white text-black px-8 py-4 rounded-full font-medium text-lg transition-all hover:bg-white/90 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full border flex items-center justify-center gap-3 bg-white text-black px-8 py-4 rounded-full font-medium text-lg transition-all hover:bg-white/90 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   <ShoppingBag className="w-5 h-5" />
                   {inStock ? 'Add to Cart' : 'Out of Stock'}
@@ -397,16 +397,16 @@ export default function ProductPage() {
                 {/* Trust Badges */}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
                   <div className="text-center">
-                    <Truck className="w-6 h-6 mx-auto mb-2 text-white/60" />
-                    <div className="text-xs text-white/60">Free Shipping</div>
+                    <Truck className="w-6 h-6 mx-auto mb-2" />
+                    <div className="text-xs">Free Shipping</div>
                   </div>
                   <div className="text-center">
-                    <Shield className="w-6 h-6 mx-auto mb-2 text-white/60" />
-                    <div className="text-xs text-white/60">Warranty</div>
+                    <Shield className="w-6 h-6 mx-auto mb-2" />
+                    <div className="text-xs">Warranty</div>
                   </div>
                   <div className="text-center">
-                    <RotateCcw className="w-6 h-6 mx-auto mb-2 text-white/60" />
-                    <div className="text-xs text-white/60">Easy Returns</div>
+                    <RotateCcw className="w-6 h-6 mx-auto mb-2" />
+                    <div className="text-xs">Easy Returns</div>
                   </div>
                 </div>
               </div>
@@ -415,34 +415,34 @@ export default function ProductPage() {
               <div className="space-y-6">
                 <div className="border-t border-white/10 pt-8">
                   <h3 className="text-lg font-light mb-4">Product Details</h3>
-                  <div className="space-y-3 text-white/80">
+                  <div className="space-y-3">
                     {product.material && (
                       <div className="flex justify-between">
-                        <span className="text-white/60">Material:</span>
+                        <span>Material:</span>
                         <span className="capitalize">{product.material}</span>
                       </div>
                     )}
                     {product.style && (
                       <div className="flex justify-between">
-                        <span className="text-white/60">Style:</span>
+                        <span className="">Style:</span>
                         <span className="capitalize">{product.style}</span>
                       </div>
                     )}
                     {product.metadata?.dimensions && (
                       <div className="flex justify-between">
-                        <span className="text-white/60">Dimensions:</span>
+                        <span className="">Dimensions:</span>
                         <span>{product.metadata.dimensions}</span>
                       </div>
                     )}
                     {product.metadata?.weight && (
                       <div className="flex justify-between">
-                        <span className="text-white/60">Weight:</span>
+                        <span className="">Weight:</span>
                         <span>{product.metadata.weight}</span>
                       </div>
                     )}
                     {product.metadata?.origin && (
                       <div className="flex justify-between">
-                        <span className="text-white/60">Made in:</span>
+                        <span className="">Made in:</span>
                         <span>{product.metadata.origin}</span>
                       </div>
                     )}
@@ -457,7 +457,7 @@ export default function ProductPage() {
                       {product.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-white/80 capitalize"
+                          className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm capitalize"
                         >
                           {tag}
                         </span>
@@ -470,7 +470,7 @@ export default function ProductPage() {
                 {product.metadata?.care && (
                   <div>
                     <h3 className="text-lg font-light mb-4">Care Instructions</h3>
-                    <p className="text-white/80">{product.metadata.care}</p>
+                    <p className="">{product.metadata.care}</p>
                   </div>
                 )}
               </div>
