@@ -57,7 +57,6 @@ class EmailService {
 
   private async verifyConnection(): Promise<void> {
     try {
-      console.log('Verifying email service configuration...');
       await this.transporter.verify();
       console.log('📧 Email service ready');
     } catch (error) {
@@ -126,7 +125,7 @@ class EmailService {
       items: itemsHtml,
       subtotal: orderData.subtotal.toFixed(2),
       tax: orderData.tax.toFixed(2),
-      shipping: orderData.shipping.toFixed(2),
+      shipping: orderData.shipping?.toFixed(2),
       total: orderData.total.toFixed(2),
       shippingAddress: `
         ${orderData.shippingAddress.street}<br>

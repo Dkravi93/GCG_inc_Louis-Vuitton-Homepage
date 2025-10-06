@@ -127,7 +127,6 @@ export const apiUtils = {
 
   async put<T>(path: string, body: unknown): Promise<T> {
     const token = getToken();
-    console.log('API PUT request:', { path, hasToken: !!token });
     const res = await fetch(`${API_URL}${path}`, {
       method: 'PUT',
       headers: {
@@ -136,10 +135,8 @@ export const apiUtils = {
       },
       body: JSON.stringify(body),
     });
-    console.log('API PUT response:', { status: res.status, ok: res.ok });
     if (!res.ok) throw new Error('Request failed');
     const data = await res.json();
-    console.log('API PUT data:', data);
     return data;
   },
 

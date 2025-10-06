@@ -74,7 +74,6 @@ export default function SearchAutocomplete({
           `http://localhost:3000/api/products/search?q=${encodeURIComponent(value)}&limit=6`
         );
         const data = await response.json();
-        console.log('Search API response:', data);
         setSuggestions(Array.isArray(data) ? data : []);
       } catch {
         setSuggestions([]);

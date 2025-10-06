@@ -33,7 +33,7 @@ export function requireAuth(
 export function requireRole(roles: ('user' | 'admin' | 'superadmin')[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthenticatedRequest;
-    console.log('User role:', authReq.user?.role);
+
     if (!authReq.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }

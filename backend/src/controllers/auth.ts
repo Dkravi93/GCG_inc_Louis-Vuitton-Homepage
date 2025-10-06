@@ -31,10 +31,6 @@
 
       // Send welcome email
       try {
-        console.log('Sending welcome email to:', user.email , {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_APP_PASSWORD,
-        });
         await emailService.sendWelcomeEmail(user.email, `${firstName} ${lastName}`);
       } catch (emailError) {
         console.error('Error sending welcome email:', emailError);
@@ -62,7 +58,7 @@
       if (!parse.success) return res.status(400).json({ message: 'Invalid credentials' });
       const { email, password } = parse.data;
       const user = await UserModel.findOne({ email });
-      console.log('Login attempt for:', email, user);
+
       if (!user) return res.status(401).json({ message: 'Invalid credentials' });
       const ok = await verifyPassword(password, user.passwordHash);
       if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
@@ -130,13 +126,11 @@
       if (!parse.success) return res.status(400).json({ message: 'Invalid data' });
 
       try {
-        console.log('Updating preferences:', req.body, authenticatedReq.user);
         const updated = await UserModel.findByIdAndUpdate(
           authenticatedReq.user.sub,
           { $set: { preferences: parse.data } },
           { new: true }
         ).lean();
-        console.log('Updated user:', updated);
         if (!updated) return res.status(404).json({ message: 'User not found' });
         
         const token = signToken({ sub: String(updated._id), email: updated.email, role: updated.role });
@@ -160,7 +154,6 @@
     export async function updateAvatar(req: Request, res: Response) {
       const authenticatedReq = req as AuthenticatedRequest;
       if (!authenticatedReq.user) return res.status(401).json({ message: 'Unauthorized' });
-      console.log('Received file:', req);
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
       }

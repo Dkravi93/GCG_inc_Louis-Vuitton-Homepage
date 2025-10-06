@@ -347,8 +347,6 @@ class PerformanceMonitor {
         ...data
       });
     }
-
-    console.log('Custom event:', event);
   }
 
   // Method to get current metrics

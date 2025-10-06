@@ -8,8 +8,8 @@ interface PayUConfig {
 
 interface PaymentData {
   txnid: string;
-  amount: string;
   productinfo: string;
+  amount: string;
   firstname: string;
   email: string;
   phone: string;
@@ -80,21 +80,31 @@ export class PayUService {
   /**
    * Generate reverse hash for payment verification
    */
-  generateReverseHash(responseData: any): string {
-    const {
-      status,
-      email,
-      firstname,
-      productinfo,
-      amount,
-      txnid
-    } = responseData;
+generateReverseHash(responseData: any): string {
+  const {
+    status,
+    email,
+    firstname,
+    productinfo,
+    amount,
+    txnid,
+    udf1 = '',
+    udf2 = '',
+    udf3 = '',
+    udf4 = '',
+    udf5 = '',
+    udf6 = '',
+    udf7 = '',
+    udf8 = '',
+    udf9 = '',
+    udf10 = ''
+  } = responseData;
 
-    // PayU reverse hash format: salt|status|||||||||||email|firstname|productinfo|amount|txnid|key
-    const hashString = `${this.config.salt}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${this.config.merchantKey}`;
-    
-    return crypto.createHash('sha512').update(hashString).digest('hex');
-  }
+  const hashString = `${this.config.salt}|${status}|${udf10}|${udf9}|${udf8}|${udf7}|${udf6}|${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${this.config.merchantKey}`;
+
+  return crypto.createHash('sha512').update(hashString).digest('hex');
+}
+
 
   /**
    * Verify payment response hash
@@ -102,7 +112,6 @@ export class PayUService {
   verifyPaymentResponse(responseData: any): boolean {
     const receivedHash = responseData.hash;
     const calculatedHash = this.generateReverseHash(responseData);
-    console.log('Verifying PayU response hash:', { receivedHash, calculatedHash });
     return receivedHash === calculatedHash;
   }
 
@@ -142,22 +151,19 @@ export class PayUService {
       txnid,
       amount: orderData.amount.toString(), // Convert to string as required by PaymentData interface
       productinfo: orderData.productInfo,
-      firstname: orderData.customerName,
       email: orderData.customerEmail,
-      phone: orderData.customerPhone,
+      firstname: orderData.customerName,
       surl: orderData.successUrl,
       furl: orderData.failureUrl,
-      udf1: orderData.orderId, // Store order ID in UDF1
-      udf2: '', // Store store identifier
+      phone: orderData.customerPhone,
+      udf1: orderData.orderId,
     };
     const hash = this.generatePaymentHash(paymentData);
 
     return {
-      ...paymentData,
       key: this.config.merchantKey,
-      hash,
-      service_provider: 'payu_paisa',
-      curl: orderData.failureUrl, // cancel URL
+      ...paymentData,
+      hash
     };
   }
 
@@ -173,15 +179,10 @@ export class PayUService {
       email: responseData.email,
       phone: responseData.phone,
       status: responseData.status,
-      payuMoneyId: responseData.payuMoneyId,
       mihpayid: responseData.mihpayid,
       mode: responseData.mode,
       bankRefNum: responseData.bank_ref_num,
       bankcode: responseData.bankcode,
-      cardnum: responseData.cardnum,
-      name_on_card: responseData.name_on_card,
-      issuing_bank: responseData.issuing_bank,
-      card_type: responseData.card_type,
       udf1: responseData.udf1, // orderId
       udf2: responseData.udf2, // store identifier
       hash: responseData.hash,

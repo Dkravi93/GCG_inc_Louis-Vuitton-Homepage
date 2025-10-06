@@ -16,6 +16,8 @@ import AccountPage from "./pages/AccountPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutFailurePage from "./pages/CheckoutFailurePage.tsx";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
+import OrderDetailsPage from "./pages/OrderDetailsPage.tsx";
 
 export default function AppRoutes() {
   const user = useAtomValue(authUserAtom);
@@ -44,8 +46,9 @@ export default function AppRoutes() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/checkout/success/" element={<PaymentSuccessPage />} />
         <Route path="/checkout/failure" element={<CheckoutFailurePage />} />
+        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />

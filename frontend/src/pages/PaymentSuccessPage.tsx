@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Loader, ArrowRight, Package, CreditCard, Clock } from 'lucide-react';
-import { ordersApi } from '../lib/api';
 import { toast } from 'sonner';
 
 interface PaymentStatus {
@@ -26,50 +25,22 @@ export default function PaymentSuccessPage() {
         const status = searchParams.get('status');
         const txnid = searchParams.get('txnid');
         const amount = searchParams.get('amount');
-        const productinfo = searchParams.get('productinfo');
-        const firstname = searchParams.get('firstname');
-        const email = searchParams.get('email');
-        const phone = searchParams.get('phone');
-        const hash = searchParams.get('hash');
-        const error = searchParams.get('error');
-        const error_Message = searchParams.get('error_Message');
+        const orderId = searchParams.get('orderId') || '';
 
         if (!mihpayid || !status || !txnid) {
           throw new Error('Invalid payment response');
         }
 
-        // Send payment response to backend for verification
-        const response = await ordersApi.handlePaymentResponse({
-          mihpayid,
-          status,
-          txnid,
-          amount,
-          productinfo,
-          firstname,
-          email,
-          phone,
-          hash,
-          error,
-          error_Message
+        setPaymentStatus({
+          status: status.toLowerCase() === 'success' ? 'success' : 'failure',
+          orderId: orderId,
+          amount: parseFloat(amount || '0'),
+          paymentId: mihpayid,
+          message: 'Payment processed successfully'
         });
 
-        if (response.success) {
-          setPaymentStatus({
-            status: status.toLowerCase() === 'success' ? 'success' : 'failure',
-            orderId: response.orderId,
-            amount: parseFloat(amount || '0'),
-            paymentId: mihpayid,
-            message: response.message || 'Payment processed successfully'
-          });
+        toast.success('Payment completed successfully!');
 
-          if (status.toLowerCase() === 'success') {
-            toast.success('Payment completed successfully!');
-          } else {
-            toast.error('Payment failed. Please try again.');
-          }
-        } else {
-          throw new Error(response.message || 'Payment verification failed');
-        }
       } catch (error: any) {
         console.error('Payment processing error:', error);
         setPaymentStatus({
@@ -162,7 +133,7 @@ export default function PaymentSuccessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -71,7 +71,6 @@ class AnalyticsService {
       console.warn('⚠️  Google Analytics tracking ID not configured');
     }
 
-    console.log('📊 Analytics service initialized');
   }
 
   /**
@@ -90,7 +89,6 @@ class AnalyticsService {
       // Update real-time metrics
       await this.updateRealTimeMetrics(event);
 
-      console.log(`📊 Event tracked: ${event.name}`);
     } catch (error) {
       console.error('❌ Failed to track event:', error);
       // Don't throw to avoid breaking the main application flow
@@ -120,7 +118,6 @@ class AnalyticsService {
       // Update conversion metrics
       await this.updateConversionMetrics(conversion);
 
-      console.log(`💰 Conversion tracked: ${conversion.eventName}`);
     } catch (error) {
       console.error('❌ Failed to track conversion:', error);
     }
@@ -179,7 +176,6 @@ class AnalyticsService {
         }
       });
 
-      console.log(`👤 Session started: ${sessionData.sessionId}`);
     } catch (error) {
       console.error('❌ Failed to start session:', error);
     }
@@ -213,7 +209,6 @@ class AnalyticsService {
         await cacheService.del(`session:${sessionId}`, CACHE_PREFIXES.SESSIONS);
       }
 
-      console.log(`👋 Session ended: ${sessionId}`);
     } catch (error) {
       console.error('❌ Failed to end session:', error);
     }
@@ -236,7 +231,6 @@ class AnalyticsService {
       // Set expiration for cleanup
       await cacheService.expire(metricKey, CACHE_TTL.VERY_LONG * 7, CACHE_PREFIXES.ANALYTICS); // 7 days
 
-      console.log(`⚡ Performance metric tracked: ${metric.metricName} = ${metric.value}`);
     } catch (error) {
       console.error('❌ Failed to track performance metric:', error);
     }
@@ -511,8 +505,6 @@ class AnalyticsService {
       const cutoffDate = new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000);
       const cutoffDateString = cutoffDate.toISOString().split('T')[0];
 
-      // This would implement cleanup logic for old events
-      console.log(`🧹 Analytics cleanup completed for data older than ${cutoffDateString}`);
     } catch (error) {
       console.error('❌ Analytics cleanup failed:', error);
     }

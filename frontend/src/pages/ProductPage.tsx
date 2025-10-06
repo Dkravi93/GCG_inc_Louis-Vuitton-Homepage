@@ -67,7 +67,6 @@ export default function ProductPage() {
     fetch(`http://localhost:3000/api/products/${id}`)
       .then((r) => r.json())
       .then(data => {
-        console.log('Product data:', data);
         setProduct(data);
         if (data.variants?.length > 0) {
           setSelectedVariant(data.variants[0]);

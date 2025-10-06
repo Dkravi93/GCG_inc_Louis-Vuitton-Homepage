@@ -91,8 +91,6 @@ export default function AccountPage() {
       if (activeTab !== "orders") return; // fetch only when orders tab is active
       setLoadingOrders(true);
       try {
-        // console.log("users:", user);
-
         const res = await fetch("http://localhost:3000/api/orders", {
           headers: {
             "Content-Type": "application/json",
@@ -100,10 +98,8 @@ export default function AccountPage() {
           },
         });
         const data = await res.json();
-        console.log("Fetched orders:", data);
         setOrders(data.orders);
       } catch (err) {
-        console.error("Failed to fetch orders", err);
         setToast({ message: "Failed to load orders", type: "error" });
       } finally {
         setLoadingOrders(false);

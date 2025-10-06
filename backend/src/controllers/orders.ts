@@ -66,7 +66,7 @@ export async function getOrders(req: Request, res: Response) {
     if (req.query.status) {
       query.status = req.query.status;
     }
-    console.log('Authenticated user:', query);
+
     const orders = await Order.find(query)
       .populate('user', 'firstName lastName email')
       .populate('items.product', 'name images basePrice category brand')
@@ -184,8 +184,8 @@ export async function createOrder(req: Request, res: Response) {
       customerName: `${user.firstName} ${user.lastName}`,
       customerEmail: user.email,
       customerPhone: req.body.phone || user.phone || '9999999999',
-      successUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/success`,
-      failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/failure`,
+      successUrl: `http://localhost:3000/api/orders/payment/callback/`,
+      failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/failure/`,
     });
 
     // Update order with PayU transaction ID
@@ -209,7 +209,6 @@ export async function createOrder(req: Request, res: Response) {
  */
 export async function handlePaymentResponse(req: Request, res: Response) {
   try {
-    console.log('Payment response received:', req.body);
     const emailService = new EmailService();
 
     // Parse payment response
@@ -223,8 +222,7 @@ export async function handlePaymentResponse(req: Request, res: Response) {
 
     // Find order using UDF1 (orderId)
     const orderId = paymentResponse.udf1;
-    const order = await Order.findById(orderId);
-
+    const order = await Order.findById(orderId).populate('user', 'firstName lastName email phone');
     if (!order) {
       console.error('Order not found:', orderId);
       return res.status(404).json({ message: 'Order not found' });
@@ -252,13 +250,11 @@ export async function handlePaymentResponse(req: Request, res: Response) {
       order.status = 'confirmed';
 
       // Send order confirmation email
-      await emailService.sendOrderConfirmation(order.user.toString(), order);
+      await emailService.sendOrderConfirmation(order.user?.email.toString(), order);
     } else {
       order.payment.status = 'failed';
       order.payment.gatewayResponse = paymentResponse;
       order.status = 'cancelled';
-      
-      console.log('Payment failed:', payuService.getFailureReason(paymentResponse));
     }
 
     await order.save();
@@ -279,7 +275,7 @@ export async function handlePaymentResponse(req: Request, res: Response) {
       // Since we can't pass a complex state in a redirect, we'll store the order data temporarily
       // and redirect with just the orderId, and update the frontend to fetch the order details
       const redirectUrl = payuService.isPaymentSuccessful(paymentResponse)
-        ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/success?orderId=${orderId}`
+        ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/success?orderId=${orderId}&mihpayid=${paymentResponse.mihpayid}&txnid=${paymentResponse.txnid}&amount=${paymentResponse.amount}&status=${paymentResponse.status}`
         : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/failure?orderId=${orderId}&error=${encodeURIComponent(payuService.getFailureReason(paymentResponse))}`;
 
       res.redirect(redirectUrl);

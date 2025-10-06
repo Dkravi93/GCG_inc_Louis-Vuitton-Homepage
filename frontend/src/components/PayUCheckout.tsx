@@ -96,11 +96,7 @@ export default function PayUCheckout({ orderData, total, onError }: PayUCheckout
         phone: orderData.phone || '9999999999'
       };
 
-      console.log('Creating order with payload:', orderPayload);
-
       const response = await ordersApi.createOrder(orderPayload);
-      
-      console.log('Order created successfully:', response);
 
       if (response.paymentRequest && response.paymentUrl) {
         setOrderCreated(true);
@@ -118,7 +114,10 @@ export default function PayUCheckout({ orderData, total, onError }: PayUCheckout
           input.value = response.paymentRequest[key];
           form.appendChild(input);
         });
-        
+        const submitInput = document.createElement('input');
+        submitInput.type = 'submit';
+        submitInput.value = 'Submit';
+        form.appendChild(submitInput);
         document.body.appendChild(form);
         form.submit();
         document.body.removeChild(form);
