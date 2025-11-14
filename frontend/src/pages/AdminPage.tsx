@@ -138,7 +138,6 @@ export default function AdminPage() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('gcg_token');
       // Mock stats for now - in real implementation, these would be separate API calls
       setStats({
         totalProducts: products.length || 0,
@@ -161,7 +160,8 @@ export default function AdminPage() {
       // First, upload any new images
       const imageUrls = [];
       for (const image of formData.images) {
-        if (image.file) {
+        console.log('Processing image:', image);
+        if (!image.file) {
           // In a real implementation, you would upload the file here
           // For now, we'll use a placeholder URL
           imageUrls.push({

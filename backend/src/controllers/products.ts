@@ -63,6 +63,7 @@
       try {
         const useDb = true;
         if (!useDb) {
+          //@ts-expect-error: mockProducts may not have a strict 'id' property type
           const productMock = mockProducts.find(p => p.id === req.params.id);
           if (!productMock) return res.status(404).json({ message: 'Not found' });
           return res.json(productMock);
@@ -135,4 +136,26 @@
       }
     }
 
+    export async function deleteProduct(req: Request, res: Response) {
+      try {
+        const productId = req.params.id;
+        const result = await ProductModel.findByIdAndDelete(productId);
+        if (!result) return res.status(404).json({ message: 'Product not found' });
+        return res.status(204).send({ status:"success", message: "Product deleted Successfully" });
+      } catch (error) {
+        return res.status(500).json({ message: 'Failed to delete product' });
+      }
+    }
 
+    export async function updateProduct(req: Request, res: Response) {
+      try {
+        const productId = req.params.id;
+        const parsed = createProductSchema.partial().safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ message: 'Invalid product data' });
+        const updated = await ProductModel.findByIdAndUpdate(productId, parsed.data, { new: true });
+        if (!updated) return res.status(404).json({ message: 'Product not found' });
+        return res.status(200).json({ status:"success", message: "Product updated Successfully", data: updated });
+      } catch (error) {
+        return res.status(500).json({ message: 'Failed to update product' });
+      }
+    }

@@ -133,6 +133,7 @@ export default function DragDropProductCreator({
           await new Promise(resolve => setTimeout(resolve, 100));
           setUploadProgress(prev => ({ ...prev, [fileName]: progress }));
         }
+        console.log('Processing image:--', preview, file);
 
         newImages.push({
           url: preview,
