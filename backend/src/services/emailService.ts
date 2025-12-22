@@ -17,7 +17,7 @@ interface EmailOptions {
   }>;
 }
 
-interface OrderData {
+export interface OrderData {
   orderNumber: string;
   customerName: string;
   items: Array<{
@@ -101,7 +101,7 @@ class EmailService {
 
   async sendOrderConfirmation(email: string, orderData: OrderData): Promise<void> {
     const template = this.loadTemplate('order-confirmation');
-    
+
     const itemsHtml = orderData.items.map(item => `
       <tr>
         <td style="padding: 15px; border-bottom: 1px solid #eee;">
@@ -147,7 +147,7 @@ class EmailService {
 
   async sendShippingNotification(email: string, orderData: any): Promise<void> {
     const template = this.loadTemplate('shipping-notification');
-    
+
     const html = this.replaceTemplateVariables(template, {
       customerName: orderData.customerName,
       orderNumber: orderData.orderNumber,
@@ -169,7 +169,7 @@ class EmailService {
   async sendPasswordReset(email: string, resetToken: string, customerName: string): Promise<void> {
     const template = this.loadTemplate('password-reset');
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
+
     const html = this.replaceTemplateVariables(template, {
       customerName,
       resetUrl,
@@ -187,7 +187,7 @@ class EmailService {
 
   async sendWelcomeEmail(email: string, customerName: string): Promise<void> {
     const template = this.loadTemplate('welcome');
-    
+
     const html = this.replaceTemplateVariables(template, {
       customerName,
       loginUrl: `${process.env.FRONTEND_URL}/login`,
@@ -206,7 +206,7 @@ class EmailService {
 
   async sendNewsletterEmail(emails: string[], subject: string, content: string): Promise<void> {
     const template = this.loadTemplate('newsletter');
-    
+
     const html = this.replaceTemplateVariables(template, {
       content,
       unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe`,
@@ -233,7 +233,7 @@ class EmailService {
 
   async sendOrderStatusUpdate(email: string, orderData: any): Promise<void> {
     const template = this.loadTemplate('order-status-update');
-    
+
     const html = this.replaceTemplateVariables(template, {
       customerName: orderData.customerName,
       orderNumber: orderData.orderNumber,
@@ -261,7 +261,7 @@ class EmailService {
       'cancelled': 'Your order has been cancelled.',
       'refunded': 'Your order has been refunded.',
     };
-    
+
     return messages[status] || 'Your order status has been updated.';
   }
 }

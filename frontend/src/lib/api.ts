@@ -1,5 +1,3 @@
-import { getToken } from './authStorage';
-
 const API_URL = 'http://localhost:3000/api';
 const BASE_URL = 'http://localhost:3000';
 
@@ -106,10 +104,7 @@ export interface AuthResponse {
 // API utilities
 export const apiUtils = {
   async post<T>(path: string, body: unknown): Promise<T> {
-    const token = getToken();
-    const headers: HeadersInit = {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
+    const headers: HeadersInit = {};
 
     // If body is FormData, don't set Content-Type (browser will set it with boundary)
     if (!(body instanceof FormData)) {
@@ -119,47 +114,71 @@ export const apiUtils = {
     const res = await fetch(`${API_URL}${path}`, {
       method: 'POST',
       headers,
+      credentials: 'include',
       body: body instanceof FormData ? body : JSON.stringify(body),
     });
-    if (!res.ok) throw new Error('Request failed');
+
+    if (!res.ok) {
+      try {
+        const error = await res.json();
+        throw new Error(error.message || 'Request failed');
+      } catch (e) {
+        throw new Error('Request failed');
+      }
+    }
     return res.json();
   },
 
   async put<T>(path: string, body: unknown): Promise<T> {
-    const token = getToken();
     const res = await fetch(`${API_URL}${path}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      credentials: 'include',
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error('Request failed');
-    const data = await res.json();
-    return data;
+    if (!res.ok) {
+      try {
+        const error = await res.json();
+        throw new Error(error.message || 'Request failed');
+      } catch (e) {
+        throw new Error('Request failed');
+      }
+    }
+    return res.json();
   },
 
   async delete<T>(path: string): Promise<T> {
-    const token = getToken();
     const res = await fetch(`${API_URL}${path}`, {
       method: 'DELETE',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: {},
+      credentials: 'include',
     });
-    if (!res.ok) throw new Error('Request failed');
+    if (!res.ok) {
+      try {
+        const error = await res.json();
+        throw new Error(error.message || 'Request failed');
+      } catch (e) {
+        throw new Error('Request failed');
+      }
+    }
     return res.json();
   },
 
   async get<T>(path: string): Promise<T> {
-    const token = getToken();
     const res = await fetch(`${API_URL}${path}`, {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: {},
+      credentials: 'include',
     });
-    if (!res.ok) throw new Error('Request failed');
+    if (!res.ok) {
+      try {
+        const error = await res.json();
+        throw new Error(error.message || 'Request failed');
+      } catch (e) {
+        throw new Error('Request failed');
+      }
+    }
     return res.json();
   },
 };
@@ -175,6 +194,8 @@ export const authApi = {
     lastName?: string;
     role?: 'user' | 'admin' | 'superadmin';
   }) => apiUtils.post<AuthResponse>('/auth/register', payload),
+  getMe: () => apiUtils.get<{ user: AuthUserDto }>('/auth/me'),
+  logout: () => apiUtils.post<{ message: string }>('/auth/logout', {}),
   updateMe: (payload: { firstName?: string; lastName?: string }) =>
     apiUtils.put<AuthResponse>('/auth/me', payload),
   updatePreferences: (payload: { theme?: 'light' | 'dark' | 'system'; locale?: string }) =>
@@ -252,7 +273,7 @@ export const ordersApi = {
     paymentRequest: any;
     paymentUrl: string;
   }>('/orders', orderData),
-  updateOrderStatus: (id: string, data: { status: string; notes?: string }) => 
+  updateOrderStatus: (id: string, data: { status: string; notes?: string }) =>
     apiUtils.put<{
       message: string;
       order: Order;

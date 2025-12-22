@@ -10,7 +10,7 @@ export async function connectToDatabase(): Promise<void> {
   }
 
   const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || '';
-  
+
   if (!mongoUri) {
     console.warn('MONGODB_URI not set. Continuing without DB connection.');
     return;
@@ -22,14 +22,10 @@ export async function connectToDatabase(): Promise<void> {
 
     const options = {
       serverSelectionTimeoutMS: 10000, // 10 seconds
-      socketTimeoutMS: 45000, // 45 seconds
       maxPoolSize: 10, // Maintain up to 10 socket connections
       minPoolSize: 2, // Maintain at least 2 socket connections
-      maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
       bufferCommands: false, // Disable mongoose buffering
       dbName: process.env.DB_NAME || 'luxury-ecommerce',
-      retryWrites: true,
-      w: 'majority'
     };
 
     await mongoose.connect(mongoUri, options);
@@ -44,7 +40,7 @@ export async function connectToDatabase(): Promise<void> {
 
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error);
-    
+
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);
     } else {

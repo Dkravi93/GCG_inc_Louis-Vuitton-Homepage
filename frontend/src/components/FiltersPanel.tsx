@@ -134,13 +134,13 @@ export default function FiltersPanel({ value, onChange }: { value: Filters; onCh
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-dark/60" />
-          <h3 className="text-sm font-medium tracking-wide text-dark">FILTERS</h3>
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-medium tracking-wide text-foreground">FILTERS</h3>
         </div>
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
-            className="text-xs text-dark/60 hover:text-dark underline"
+            className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
           >
             Clear all
           </button>
@@ -151,11 +151,11 @@ export default function FiltersPanel({ value, onChange }: { value: Filters; onCh
       <div className="space-y-3">
         <button
           onClick={() => toggleSection('sort')}
-          className="flex w-full items-center justify-between text-left text-sm font-medium text-dark"
+          className="flex w-full items-center justify-between text-left text-sm font-medium text-foreground hover:text-primary transition-colors"
         >
           Sort by
           <ChevronDown 
-            className={`h-4 w-4 transition-transform ${
+            className={`h-4 w-4 transition-transform text-muted-foreground ${
               openSections.has('sort') ? 'rotate-180' : ''
             }`} 
           />
@@ -180,11 +180,11 @@ export default function FiltersPanel({ value, onChange }: { value: Filters; onCh
         <div key={section.key} className="space-y-3">
           <button
             onClick={() => toggleSection(section.key)}
-            className="flex w-full items-center justify-between text-left text-sm font-medium text-dark"
+            className="flex w-full items-center justify-between text-left text-sm font-medium text-foreground hover:text-primary transition-colors"
           >
             {section.title}
             <ChevronDown 
-              className={`h-4 w-4 transition-transform ${
+              className={`h-4 w-4 transition-transform text-muted-foreground ${
                 openSections.has(section.key) ? 'rotate-180' : ''
               }`} 
             />
@@ -211,11 +211,11 @@ export default function FiltersPanel({ value, onChange }: { value: Filters; onCh
       <div className="space-y-3">
         <button
           onClick={() => toggleSection('special')}
-          className="flex w-full items-center justify-between text-left text-sm font-medium text-dark"
+          className="flex w-full items-center justify-between text-left text-sm font-medium text-foreground hover:text-primary transition-colors"
         >
           Special Collections
           <ChevronDown 
-            className={`h-4 w-4 transition-transform ${
+            className={`h-4 w-4 transition-transform text-muted-foreground ${
               openSections.has('special') ? 'rotate-180' : ''
             }`} 
           />
@@ -226,33 +226,33 @@ export default function FiltersPanel({ value, onChange }: { value: Filters; onCh
           animate={{ height: openSections.has('special') ? 'auto' : 0 }}
           className="overflow-hidden"
         >
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 text-sm text-dark/90 cursor-pointer hover:text-dark transition-colors">
+          <div className="space-y-3 pt-1">
+            <label className="flex items-center gap-3 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors group">
               <input 
                 type="checkbox" 
                 checked={!!local.featured} 
                 onChange={(e) => set('featured', e.target.checked)}
-                className="rounded border-dark/20 bg-dark/5 text-dark focus:ring-dark/20 focus:ring-offset-0"
+                className="rounded border-input bg-background/50 text-primary focus:ring-ring focus:ring-offset-0 transition-all checked:bg-primary checked:border-primary"
               />
-              Featured Items
+              <span className="group-hover:translate-x-1 transition-transform">Featured Items</span>
             </label>
-            <label className="flex items-center gap-3 text-sm text-dark/90 cursor-pointer hover:text-dark transition-colors">
+            <label className="flex items-center gap-3 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors group">
               <input 
                 type="checkbox" 
                 checked={!!local.onSale} 
                 onChange={(e) => set('onSale', e.target.checked)}
-                className="rounded border-dark/20 bg-dark/5 text-dark focus:ring-dark/20 focus:ring-offset-0"
+                className="rounded border-input bg-background/50 text-primary focus:ring-ring focus:ring-offset-0 transition-all checked:bg-primary checked:border-primary"
               />
-              On Sale
+              <span className="group-hover:translate-x-1 transition-transform">On Sale</span>
             </label>
-            <label className="flex items-center gap-3 text-sm text-dark/90 cursor-pointer hover:text-dark transition-colors">
+            <label className="flex items-center gap-3 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors group">
               <input 
                 type="checkbox" 
                 checked={!!local.limitedEdition} 
                 onChange={(e) => set('limitedEdition', e.target.checked)}
-                className="rounded border-dark/20 bg-dark/5 text-dark focus:ring-dark/20 focus:ring-offset-0"
+                className="rounded border-input bg-background/50 text-primary focus:ring-ring focus:ring-offset-0 transition-all checked:bg-primary checked:border-primary"
               />
-              Limited Edition
+              <span className="group-hover:translate-x-1 transition-transform">Limited Edition</span>
             </label>
           </div>
         </motion.div>

@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { AppError } from '../utils/appError';
 import { errorHandler } from '../middleware/error';
@@ -15,6 +16,8 @@ import authRouter from '../routes/auth';
 import adminRouter from '../routes/admin';
 import ordersRouter from '../routes/orders';
 import errorsRouter from '../routes/errors';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from '../config/swagger';
 
 const app = express();
 
@@ -39,11 +42,12 @@ const helmetConfig = {
 };
 
 app.use(helmet(helmetConfig));
+app.use(cookieParser());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL
     : ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -124,6 +128,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/errors', errorsRouter);
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 404 handler
 app.use((req, res) => {

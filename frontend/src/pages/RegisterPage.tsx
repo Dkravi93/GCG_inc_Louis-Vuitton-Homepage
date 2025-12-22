@@ -1,9 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useSetAtom } from "jotai";
 import { authApi } from "../lib/api";
+import { setAuthAtom } from "../store/auth";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const setAuth = useSetAtom(setAuthAtom);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,7 +16,8 @@ export default function RegisterPage() {
   async function onSubmit() {
     setError(null);
     try {
-      await authApi.register({ email, password, firstName, lastName });
+      const res = await authApi.register({ email, password, firstName, lastName });
+      setAuth({ user: res.user });
       navigate("/");
     } catch {
       setError("Registration failed");

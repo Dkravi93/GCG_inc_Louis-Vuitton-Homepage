@@ -16,11 +16,18 @@ export function requireAuth(
   next: NextFunction
 ) {
   const header = req.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
+  let token;
+
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  } else if (header && header.startsWith('Bearer ')) {
+    token = header.slice('Bearer '.length);
+  }
+
+  if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-  
-  const token = header.slice('Bearer '.length);
+
   try {
     const authReq = req as AuthenticatedRequest;
     authReq.user = verifyToken(token) as AuthUser & Document;
@@ -37,7 +44,7 @@ export function requireRole(roles: ('user' | 'admin' | 'superadmin')[]) {
     if (!authReq.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-  
+
     if (!authReq.user.role || !roles.includes(authReq.user.role)) {
       return res.status(403).json({ message: 'Forbidden' });
     }

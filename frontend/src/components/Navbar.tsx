@@ -33,7 +33,7 @@ export default function Navbar() {
     setError(null);
     try {
       const res = await authApi.login({ email, password });
-      setAuth({ token: res.token, user: res.user });
+      setAuth({ user: res.user });
       setHoverUser(false);
       setEmail("");
       setPassword("");
@@ -60,7 +60,7 @@ export default function Navbar() {
       <div className="relative">
         <nav
           className={
-            "mx-auto flex max-w-7xl items-center justify-between px-6 py-4 transition-all duration-300 "
+            "mx-auto flex max-w-[90%] 2xl:max-w-screen-2xl items-center justify-between px-6 py-4 transition-all duration-300 "
           }
         >
           {/* Mobile Hamburger */}
@@ -194,94 +194,120 @@ export default function Navbar() {
               <AnimatePresence>
                 {hoverUser && (
                   <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 p-4 shadow-2xl backdrop-blur"
+                    initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute right-0 mt-3 w-80 overflow-hidden rounded-xl border border-border bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 p-4 z-[100]"
                   >
-                    <div className="mb-3 text-sm font-medium">
-                      {user ? "Account" : "Welcome"}
+                    <div className="mb-4 text-sm font-medium tracking-wide text-foreground border-b border-border pb-2">
+                      {user ? "My Account" : "Welcome"}
                     </div>
                     {!user && (
                       <div className="grid gap-3">
-                        <input
-                          className="rounded-lg border border-white/10 px-3 py-2 text-sm placeholder:text-white/50 focus:outline-none"
-                          placeholder="Email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <input
-                          className="rounded-lg border border-white/10 px-3 py-2 text-sm  focus:outline-none"
-                          placeholder="Password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                        />
+                        <div className="space-y-1">
+                          <input
+                            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                            placeholder="Email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <input
+                            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                            placeholder="Password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                        </div>
                         {error && (
-                          <div className="text-xs text-red-400">{error}</div>
+                          <div className="text-xs text-destructive font-medium px-1 flex items-center gap-1">
+                             <div className="w-1 h-1 rounded-full bg-destructive"></div>
+                             {error}
+                          </div>
                         )}
                         <button
                           type="button"
-                          className="rounded-full px-4 py-2 text-sm font-medium text-black hover:opacity-90"
+                          className="mt-1 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                           onClick={quickLogin}
                         >
-                          Login
+                          Sign In
                         </button>
                       </div>
                     )}
                     {user && (
-                      <div className="grid gap-2">
-                        <div className="mb-2 flex items-center gap-3">
+                      <div className="grid gap-1">
+                        <div className="mb-3 flex items-center gap-3 rounded-lg bg-muted/50 p-3">
                           {user.avatarUrl ? (
                             <img
                               src={getImageUrl(user.avatarUrl)}
-                              className="h-8 w-8 rounded-full object-cover"
+                              className="h-10 w-10 rounded-full object-cover border border-border"
+                              alt={user.firstName}
                             />
                           ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full text-xs">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
                               {(user.firstName?.[0] || "?").toUpperCase()}
                             </div>
                           )}
-                          <div>
-                            <div className="text-sm">
+                          <div className="overflow-hidden">
+                            <div className="truncate text-sm font-medium text-foreground">
                               {user.firstName} {user.lastName}
                             </div>
-                            <div className="text-[10px]">{user.email}</div>
+                            <div className="truncate text-xs text-muted-foreground">{user.email}</div>
                           </div>
                         </div>
                         {(user.role === "admin" ||
                           user.role === "superadmin") && (
                           <Link
                             to="/admin"
-                            className="rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10"
+                            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           >
-                            Admin
+                           <User size={16} /> 
+                            Admin Dashboard
                           </Link>
                         )}
                         <Link
                           to="/account"
-                          className="rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10"
+                          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
-                          Account
+                          <User size={16} />
+                          Account Settings
                         </Link>
                         <button
                           onClick={() => {
                             clearAuth();
                             setHoverUser(false);
                           }}
-                          className="rounded-lg border border-white/10 px-3 py-2 text-left text-sm hover:bg-white/10"
+                          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-destructive transition-colors hover:bg-utils-destructive/10 hover:text-destructive"
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-log-out"
+                          >
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" x2="9" y1="12" y2="12" />
+                          </svg>
                           Logout
                         </button>
                       </div>
                     )}
                     {!user && (
-                      <div className="mt-3 text-xs">
-                        New here?{" "}
-                        <Link to="/register" className="underline">
-                          Create an account
+                      <div className="mt-4 border-t border-border pt-3 text-center text-xs text-muted-foreground">
+                        Don't have an account?{" "}
+                        <Link to="/register" className="font-medium text-primary hover:underline">
+                          Create one
                         </Link>
                       </div>
                     )}

@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import CollectionsPage from "./pages/CollectionsPage";
 import ProductPage from "./pages/ProductPage";
@@ -8,8 +9,9 @@ import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Navbar from "./components/Navbar";
-import { useAtomValue } from "jotai";
-import { authUserAtom } from "./store/auth";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { authUserAtom, authLoadingAtom, setAuthAtom } from "./store/auth";
+import { authApi } from "./lib/api";
 import { Navigate} from "react-router-dom";
 import AdminPage from "./pages/AdminPage.tsx";
 import AccountPage from "./pages/AccountPage.tsx";
@@ -21,6 +23,31 @@ import OrderDetailsPage from "./pages/OrderDetailsPage.tsx";
 
 export default function AppRoutes() {
   const user = useAtomValue(authUserAtom);
+  const setAuth = useSetAtom(setAuthAtom);
+  const [loading, setLoading] = useAtom(authLoadingAtom);
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const { user } = await authApi.getMe();
+        setAuth({ user });
+      } catch (error) {
+        // Not authenticated
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkAuth();
+  }, [setAuth, setLoading]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen">
       {/* Background Video */}

@@ -12,7 +12,7 @@ const errorReportSchema = z.object({
   timestamp: z.string().optional(),
   userId: z.string().optional(),
   sessionId: z.string().optional(),
-  additionalInfo: z.record(z.any()).optional()
+  additionalInfo: z.record(z.string(), z.any()).optional()
 });
 
 /**
@@ -22,7 +22,7 @@ export async function reportError(req: Request, res: Response) {
   try {
     console.log('🚨 Client Error Report:', req.body);
     const validation = errorReportSchema.safeParse(req.body);
-    
+
     if (!validation.success) {
       return res.status(400).json({
         success: false,
@@ -32,7 +32,7 @@ export async function reportError(req: Request, res: Response) {
     }
 
     const errorData = validation.data;
-    
+
     // Log the error to console (in production, you might want to send to a logging service)
     console.error('🚨 Client Error Report:', {
       message: errorData.message,
@@ -46,7 +46,7 @@ export async function reportError(req: Request, res: Response) {
       sessionId: errorData.sessionId,
       additionalInfo: errorData.additionalInfo,
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgentHeader: req.get('User-Agent')
     });
 
     // In a production environment, you might want to:

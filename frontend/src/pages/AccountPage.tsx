@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { authTokenAtom, authUserAtom, setAuthAtom } from "../store/auth";
+import { useAtom, useSetAtom } from "jotai";
+import { authUserAtom, setAuthAtom } from "../store/auth";
 import { authApi, getImageUrl } from "../lib/api";
 import { atom } from "jotai";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,7 +38,6 @@ type ActiveTab =
 
 export default function AccountPage() {
   const [user] = useAtom(authUserAtom);
-  const token = useAtomValue(authTokenAtom);
   const setAuth = useSetAtom(setAuthAtom);
   const [toast, setToast] = useAtom(toastAtom);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +76,7 @@ export default function AccountPage() {
     setSaving(true);
     try {
       const response = await authApi.updateMe({ firstName, lastName });
-      setAuth({ token: response.token, user: response.user });
+      setAuth({ user: response.user });
       setToast({ message: "Profile updated successfully", type: "success" });
     } catch (error) {
       setToast({ message: "Failed to update profile", type: "error" });
@@ -91,11 +90,11 @@ export default function AccountPage() {
       if (activeTab !== "orders") return; // fetch only when orders tab is active
       setLoadingOrders(true);
       try {
-        const res = await fetch("http://localhost:3000/api/orders", {
+        const res = await fetch("/api/orders", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // if your API needs auth
           },
+          credentials: "include",
         });
         const data = await res.json();
         setOrders(data.orders);
@@ -114,7 +113,7 @@ export default function AccountPage() {
       setAppTheme(newTheme);
       if (user) {
         const response = await authApi.updatePreferences({ theme: newTheme });
-        setAuth({ token: response.token, user: response.user });
+        setAuth({ user: response.user });
       }
       setToast({ message: "Theme updated successfully", type: "success" });
     } catch (error) {
@@ -129,7 +128,7 @@ export default function AccountPage() {
     setUploading(true);
     try {
       const response = await authApi.updateAvatar(file);
-      setAuth({ token: response.token, user: response.user });
+      setAuth({ user: response.user });
       setToast({ message: "Avatar updated successfully", type: "success" });
     } catch (error) {
       setToast({ message: "Failed to update avatar", type: "error" });
@@ -607,7 +606,7 @@ case "orders":
         )}
       </AnimatePresence>
 
-      <div className="mx-auto max-w-7xl px-6 py-20">
+      <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-20">
         {/* Header */}
         <div className="mb-12">
           <motion.h1

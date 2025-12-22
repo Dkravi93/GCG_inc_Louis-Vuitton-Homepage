@@ -143,7 +143,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="max-w-4xl"
+            className="max-w-6xl"
           >
             <h1 className="mb-6 text-6xl font-extralight tracking-tight md:text-8xl lg:text-9xl">
               {campaign.title}
@@ -206,7 +206,7 @@ export default function HomePage() {
 
       {/* Shop by Category Section */}
       <section className="py-24 px-6">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-extralight tracking-tight md:text-6xl mb-6">
               Shop by Category
@@ -251,7 +251,7 @@ export default function HomePage() {
 
       {/* Editorial Storytelling Section */}
       <section className="py-24 px-6">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}

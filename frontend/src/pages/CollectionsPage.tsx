@@ -1,12 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Grid, List, SlidersHorizontal, X } from "lucide-react";
+import { Grid, List, SlidersHorizontal, X } from "lucide-react";
 import { SimplePersistentCTAs } from "../components/PersistentCTAs";
 import FiltersPanel, { type Filters } from "../components/FiltersPanel";
 import ProductGrid, { type ProductItem } from "../components/ProductGrid";
 import SearchAutocomplete from "../components/SearchAutocomplete";
-import { useTheme } from "../contexts/ThemeContext";
 
 type ViewMode = 'grid' | 'list';
 
@@ -44,7 +43,6 @@ const collectionBanners = {
 };
 
 export default function CollectionsPage() {
-  const { theme } = useTheme();
   const { collection } = useParams();
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<Filters>({ 
@@ -97,7 +95,7 @@ export default function CollectionsPage() {
   }, [filters]);
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-dark/90 text-white' : 'bg-white text-black'} min-h-screen`}>
+    <div className="bg-background text-foreground min-h-screen">
       {/* Collection Banner */}
       {collectionInfo && (
         <section className="relative h-96 w-full overflow-hidden">
@@ -113,7 +111,7 @@ export default function CollectionsPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="text-5xl md:text-7xl font-extralight tracking-tight mb-4"
+                className="text-5xl md:text-7xl font-extralight tracking-tight mb-4 text-white"
               >
                 {collectionInfo.title}
               </motion.h1>
@@ -138,7 +136,7 @@ export default function CollectionsPage() {
         </section>
       )}
       <SimplePersistentCTAs />
-      <main className="mx-auto max-w-7xl px-6 py-20">
+      <main className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-20">
         {/* Refined Header Section */}
         <div className="mb-12">
           <motion.div
@@ -146,10 +144,10 @@ export default function CollectionsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-extralight tracking-tight text-dark mb-4">
+            <h2 className="text-3xl md:text-4xl font-extralight tracking-tight mb-4">
               {collection ? collectionInfo?.title || `${collection.charAt(0).toUpperCase() + collection.slice(1)} Collection` : 'All Products'}
             </h2>
-            <p className="text-dark/70 max-w-2xl">
+            <p className="text-muted-foreground max-w-2xl">
               {collection ? collectionInfo?.description || 'Discover our curated selection of premium eyewear.' : 'Browse our complete collection of luxury eyewear and accessories.'}
             </p>
           </motion.div>
@@ -167,11 +165,13 @@ export default function CollectionsPage() {
           
           <div className="flex items-center gap-4">
             {/* View Mode Toggle */}
-            <div className="hidden lg:flex rounded-lg border border-white/20 bg-white/5 p-1">
+            <div className="hidden lg:flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`rounded p-2 transition-colors ${
-                  viewMode === 'grid' ? 'bg-white text-black' : 'hover:bg-white/10'
+                className={`rounded-md p-2 transition-all duration-200 ${
+                  viewMode === 'grid' 
+                    ? 'bg-primary text-primary-foreground shadow-sm ring-1 ring-black/5' 
+                    : 'text-muted-foreground hover:bg-background/50 hover:text-foreground'
                 }`}
                 aria-label="Grid view"
               >
@@ -179,8 +179,10 @@ export default function CollectionsPage() {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`rounded p-2 transition-colors ${
-                  viewMode === 'list' ? 'bg-white text-black' : 'hover:bg-white/10'
+                className={`rounded-md p-2 transition-all duration-200 ${
+                  viewMode === 'list' 
+                    ? 'bg-primary text-primary-foreground shadow-sm ring-1 ring-black/5' 
+                    : 'text-muted-foreground hover:bg-background/50 hover:text-foreground'
                 }`}
                 aria-label="List view"
               >
@@ -191,22 +193,22 @@ export default function CollectionsPage() {
             {/* Mobile Filter Toggle */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="lg:hidden flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 hover:bg-white/10"
+              className="lg:hidden flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 hover:bg-muted"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
               {activeFiltersCount > 0 && (
-                <span className="rounded-full bg-white text-black px-2 py-1 text-xs font-medium">
+                <span className="rounded-full bg-primary text-primary-foreground px-2 py-1 text-xs font-medium">
                   {activeFiltersCount}
                 </span>
               )}
             </button>
 
             {/* Results Count */}
-            <div className="text-sm text-white/60 font-light tracking-wide">
+            <div className="text-sm text-muted-foreground font-light tracking-wide">
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                   Loading collection...
                 </div>
               ) : (
@@ -220,7 +222,7 @@ export default function CollectionsPage() {
           {/* Desktop Filters Sidebar */}
           <div className="hidden lg:block">
             <div className="sticky top-24">
-              <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-6 backdrop-blur-sm">
+              <div className="rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm">
                 <FiltersPanel 
                   value={filters} 
                   onChange={(f) => { setFilters(f); setPage(1); }}
@@ -242,10 +244,10 @@ export default function CollectionsPage() {
                 >
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="group">
-                      <div className="aspect-square bg-gradient-to-br from-white/10 to-white/5 rounded-2xl mb-4 animate-pulse" />
+                      <div className="aspect-square bg-muted rounded-2xl mb-4 animate-pulse" />
                       <div className="space-y-2">
-                        <div className="h-4 bg-white/10 rounded animate-pulse" />
-                        <div className="h-6 bg-white/10 rounded w-24 animate-pulse" />
+                        <div className="h-4 bg-muted rounded animate-pulse" />
+                        <div className="h-6 bg-muted rounded w-24 animate-pulse" />
                       </div>
                     </div>
                   ))}
@@ -258,9 +260,9 @@ export default function CollectionsPage() {
                   exit={{ opacity: 0 }}
                   className="text-center py-20"
                 >
-                  <div className="text-6xl text-white/10 mb-4">👓</div>
-                  <h3 className="text-2xl font-light text-white/80 mb-2">No products found</h3>
-                  <p className="text-white/60">Try adjusting your filters or search terms</p>
+                  <div className="text-6xl text-muted-foreground/20 mb-4">👓</div>
+                  <h3 className="text-2xl font-light text-muted-foreground mb-2">No products found</h3>
+                  <p className="text-muted-foreground/60">Try adjusting your filters or search terms</p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -280,7 +282,7 @@ export default function CollectionsPage() {
                 <button 
                   disabled={page === 1 || loading} 
                   onClick={() => setPage((p) => Math.max(1, p - 1))} 
-                  className="rounded-full border border-white/20 bg-white/5 px-8 py-3 font-light transition-all hover:bg-white/10 hover:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-full border border-border bg-card px-8 py-3 font-light transition-all hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
@@ -293,8 +295,8 @@ export default function CollectionsPage() {
                         onClick={() => setPage(pageNum)}
                         className={`h-12 w-12 rounded-full font-light transition-all ${
                           pageNum === page 
-                            ? 'bg-white text-black shadow-lg' 
-                            : 'border border-white/20 hover:bg-white/10 hover:border-white/40'
+                            ? 'bg-primary text-primary-foreground shadow-lg' 
+                            : 'border border-border hover:bg-muted'
                         }`}
                       >
                         {pageNum}
@@ -305,7 +307,7 @@ export default function CollectionsPage() {
                 <button 
                   disabled={page >= Math.ceil(total / pageSize) || loading} 
                   onClick={() => setPage((p) => p + 1)} 
-                  className="rounded-full border border-white/20 bg-white/5 px-8 py-3 font-light transition-all hover:bg-white/10 hover:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-full border border-border bg-card px-8 py-3 font-light transition-all hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

@@ -130,21 +130,17 @@ export function getThemeClasses(lightClass: string, darkClass: string): string {
 export function useThemeClasses() {
   const { actualTheme } = useTheme();
   
+  // Return semantic classes that map to CSS variables in index.css
+  // This ensures consistency with the global theme variables.
   return {
-    bg: actualTheme === 'light' ? 'bg-white' : 'bg-gray-900',
-    text: actualTheme === 'light' ? 'text-gray-900' : 'text-white',
-    border: actualTheme === 'light' ? 'border-gray-200' : 'border-gray-700',
-    card: actualTheme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700',
-    input: actualTheme === 'light' 
-      ? 'bg-white border-gray-300 text-gray-900 placeholder-gray-500' 
-      : 'bg-gray-800 border-gray-600 text-white placeholder-gray-400',
+    bg: 'bg-background',
+    text: 'text-foreground',
+    border: 'border-border',
+    card: 'bg-card text-card-foreground border border-border',
+    input: 'bg-input border-input text-foreground placeholder-muted-foreground',
     button: {
-      primary: actualTheme === 'light' 
-        ? 'bg-black text-white hover:bg-gray-800' 
-        : 'bg-white text-black hover:bg-gray-200',
-      secondary: actualTheme === 'light' 
-        ? 'bg-gray-100 text-gray-900 hover:bg-gray-200' 
-        : 'bg-gray-700 text-white hover:bg-gray-600',
+      primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
     }
   };
 }

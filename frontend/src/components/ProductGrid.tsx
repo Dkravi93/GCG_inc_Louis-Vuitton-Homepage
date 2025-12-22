@@ -81,21 +81,21 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="group flex gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-colors"
+        className="group flex gap-6 rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all"
       >
-        <div className="relative flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden">
+        <div className="relative flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden bg-muted">
           <img
             src={primaryImage}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           {product.limitedEdition && (
-            <div className="absolute top-2 left-2 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-2 py-1 text-xs font-medium text-black">
+            <div className="absolute top-2 left-2 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-2 py-1 text-xs font-medium text-black shadow-sm">
               Limited
             </div>
           )}
           {product.onSale && product.discount && (
-            <div className="absolute top-2 right-2 rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white">
+            <div className="absolute top-2 right-2 rounded-full bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground shadow-sm">
               -{product.discount.type === 'percentage' ? `${product.discount.value}%` : `$${product.discount.value}`}
             </div>
           )}
@@ -105,13 +105,13 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
           <div className="flex items-start justify-between mb-2">
             <div>
               {product.brand && (
-                <div className="text-sm text-white/60 uppercase tracking-wider mb-1">
+                <div className="text-sm text-muted-foreground uppercase tracking-wider mb-1">
                   {product.brand}
                 </div>
               )}
               <Link 
                 to={`/product/${product._id}`}
-                className="text-xl font-light hover:text-white/80 transition-colors"
+                className="text-xl font-light hover:text-primary transition-colors"
               >
                 {product.name}
               </Link>
@@ -120,27 +120,28 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}
-                className="rounded-full bg-white/10 p-2 hover:bg-white/20 transition-colors"
+                className="rounded-full border border-border bg-background p-2 hover:bg-muted transition-colors"
               >
-                <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+                <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
               </button>
               <Link
                 to={`/product/${product._id}`}
-                className="rounded-full bg-white/10 p-2 hover:bg-white/20 transition-colors"
+                className="rounded-full border border-border bg-background p-2 hover:bg-muted transition-colors"
+                title="View details"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4 text-muted-foreground" />
               </Link>
             </div>
           </div>
           
-          <div className="text-sm text-white/60 mb-3">{product.category}</div>
+          <div className="text-sm text-muted-foreground mb-3 capitalize">{product.category}</div>
           
           <div className="flex items-center gap-4 mb-3">
             <div className="flex items-center gap-3">
               {product.onSale && product.discount ? (
                 <>
                   <span className="text-2xl font-light">${discountedPrice.toFixed(2)}</span>
-                  <span className="text-lg text-white/50 line-through">${product.basePrice.toFixed(2)}</span>
+                  <span className="text-lg text-muted-foreground/50 line-through">${product.basePrice.toFixed(2)}</span>
                 </>
               ) : (
                 <span className="text-2xl font-light">${product.basePrice.toFixed(2)}</span>
@@ -149,28 +150,28 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
             
             {availableColors.length > 0 && (
               <div className="flex items-center gap-1">
-                <span className="text-xs text-white/60 mr-2">{availableColors.length} colors</span>
+                <span className="text-xs text-muted-foreground mr-2">{availableColors.length} colors</span>
                 {availableColors.slice(0, 3).map((color, index) => (
                   <div
                     key={index}
-                    className="w-4 h-4 rounded-full border border-white/20"
+                    className="w-4 h-4 rounded-full border border-border shadow-sm"
                     style={{ backgroundColor: color.toLowerCase() }}
                   />
                 ))}
                 {availableColors.length > 3 && (
-                  <span className="text-xs text-white/60 ml-1">+{availableColors.length - 3}</span>
+                  <span className="text-xs text-muted-foreground ml-1">+{availableColors.length - 3}</span>
                 )}
               </div>
             )}
           </div>
           
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-white/60">
+          <div className="flex items-center justify-between mt-4">
+            <div className={`text-sm ${inStock ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {inStock ? 'In Stock' : 'Out of Stock'}
             </div>
             
             <button 
-              className="rounded-full bg-white px-6 py-2 text-sm font-medium text-black cursor-pointer transition-colors hover:bg-white/90 disabled:opacity-50"
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md active:scale-95"
               onClick={handleAddToCart}
               disabled={!inStock}
             >
@@ -189,7 +190,7 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
       className="group"
     >
       <Link to={`/product/${product._id}`} className="block">
-        <div className="relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-800 shadow-lg">
+        <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted border border-border shadow-sm transition-all hover:shadow-md">
           <img
             src={primaryImage}
             alt={product.name}
@@ -226,40 +227,49 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
               </div>
             )}
             {product.onSale && product.discount && (
-              <div className="rounded-full bg-gradient-to-r from-red-500 to-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+              <div className="rounded-full bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground shadow-lg">
                 -{product.discount.type === 'percentage' ? `${product.discount.value}%` : `$${product.discount.value}`}
               </div>
             )}
           </div>
           
-          {/* Quick Actions */}
-          <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 transform translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+          {/* Hover Actions */}
+          <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 z-10 flex flex-col gap-2">
+             <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddToCart();
+              }}
+              className="w-full rounded-full bg-primary/95 backdrop-blur-md py-3 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary transition-all active:scale-[0.98] border border-primary/10 flex items-center justify-center gap-2"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Add to Cart
+            </button>
+          </div>
+
+          {/* Top Right Actions */}
+          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 z-10">
             <button
               onClick={(e) => {
                 e.preventDefault();
                 setIsWishlisted(!isWishlisted);
               }}
-              className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 text-white hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
-              aria-label="Add to wishlist"
+              className="rounded-full bg-background/80 backdrop-blur-md p-2.5 text-foreground hover:bg-background transition-all border border-border/50 shadow-sm hover:scale-105"
             >
-              <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
             </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                // Add to cart logic here
-              }}
-              className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 text-white hover:bg-black/80 transition-all duration-200 border border-white/10 hover:border-white/20 hover:scale-110"
-              aria-label="Add to cart"
+            <Link
+              to={`/product/${product._id}`}
+              className="rounded-full bg-background/80 backdrop-blur-md p-2.5 text-foreground hover:bg-background transition-all border border-border/50 shadow-sm hover:scale-105"
             >
-              <ShoppingBag className="h-4 w-4" />
-            </button>
+               <Eye className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </div>
           
           {/* Stock Status */}
           {!inStock && (
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-              <div className="rounded-lg bg-white/10 backdrop-blur px-4 py-2 text-sm font-medium">
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center">
+              <div className="rounded-lg bg-card/90 border border-border backdrop-blur px-4 py-2 text-sm font-medium text-foreground">
                 Out of Stock
               </div>
             </div>
@@ -268,50 +278,50 @@ function ProductCard({ product, isListView = false }: { product: ProductItem; is
       </Link>
       
       {/* Product Info */}
-      <div className="mt-6 space-y-3">
+      <div className="mt-4 space-y-2">
         {product.brand && (
-          <div className="text-sm text-white/50 uppercase tracking-[0.2em] font-light">
+          <div className="text-xs text-muted-foreground uppercase tracking-widest font-medium">
             {product.brand}
           </div>
         )}
         
         <Link 
           to={`/product/${product._id}`}
-          className="block text-lg font-light hover:text-white/80 transition-colors leading-tight"
+          className="block text-lg font-medium text-foreground hover:text-primary transition-colors leading-tight"
         >
           {product.name}
         </Link>
         
-        <div className="text-sm text-white/50 capitalize tracking-wide">{product.category}</div>
+        <div className="text-sm text-muted-foreground capitalize">{product.category}</div>
         
         {/* Colors */}
         {availableColors.length > 0 && (
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center -space-x-1.5">
               {availableColors.slice(0, 4).map((color, index) => (
                 <div
                   key={index}
-                  className="w-6 h-6 rounded-full border-2 border-white/20 hover:border-white/50 hover:scale-110 transition-all cursor-pointer shadow-sm"
+                  className="w-5 h-5 rounded-full border border-background shadow-sm ring-1 ring-border/50"
                   style={{ backgroundColor: color.toLowerCase() }}
                   title={color}
                 />
               ))}
             </div>
             {availableColors.length > 4 && (
-              <span className="text-xs text-white/50 font-light">+{availableColors.length - 4} more</span>
+              <span className="text-xs text-muted-foreground font-medium">+{availableColors.length - 4}</span>
             )}
           </div>
         )}
         
         {/* Price */}
-        <div className="flex items-center gap-3 pt-1">
+        <div className="flex items-center gap-2 pt-1">
           {product.onSale && product.discount ? (
             <>
-              <span className="text-2xl font-extralight tracking-tight">${discountedPrice.toFixed(2)}</span>
-              <span className="text-base text-white/40 line-through font-light">${product.basePrice.toFixed(2)}</span>
+              <span className="text-lg font-semibold tracking-tight text-foreground">${discountedPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">${product.basePrice.toFixed(2)}</span>
             </>
           ) : (
-            <span className="text-2xl font-extralight tracking-tight">${product?.basePrice && product?.basePrice.toFixed(2)? product?.basePrice.toFixed(2) : 'N/A'}</span>
+            <span className="text-lg font-semibold tracking-tight text-foreground">${product?.basePrice && product?.basePrice.toFixed(2)? product?.basePrice.toFixed(2) : 'N/A'}</span>
           )}
         </div>
       </div>

@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
-  Filter, 
-  MoreHorizontal, 
   Eye, 
   Edit, 
   Trash2, 
   Upload,
-  Save,
   X,
-  Calendar,
   DollarSign,
   Package,
   Users,
@@ -20,12 +17,13 @@ import {
   CheckCircle,
   Clock,
   Star,
-  Image as ImageIcon,
-  Tag
+  Tag,
+  Book
 } from 'lucide-react';
 import { useAtomValue } from 'jotai';
 import { authUserAtom } from '../store/auth';
-import DragDropProductCreator from '../components/DragDropProductCreator';
+import { productsApi } from '../lib/api';
+import DragDropProductCreator, { ProductFormData } from '../components/DragDropProductCreator';
 
 interface Product {
   _id: string;
@@ -37,46 +35,27 @@ interface Product {
   onSale?: boolean;
   limitedEdition?: boolean;
   hidden?: boolean;
-  launchAt?: Date;
+  launchAt?: string;
   images?: Array<{ url: string; isPrimary?: boolean }>;
   variants?: Array<{ sku: string; color: string; size: string; stock: number }>;
   createdAt?: Date;
   updatedAt?: Date;
-}
-
-interface CreateProductForm {
-  name: string;
-  basePrice: number;
-  category: string;
-  brand: string;
-  description: string;
-  material: string;
-  gender: 'men' | 'women' | 'unisex';
-  style: string;
-  featured: boolean;
-  onSale: boolean;
-  limitedEdition: boolean;
-  hidden: boolean;
-  launchAt: string;
-  tags: string;
-  discount: {
+  description?: string;
+  material?: string;
+  style?: string;
+  tags?: string[];
+  discount?: {
     type: 'percentage' | 'fixed';
     value: number;
   };
-  variants: Array<{
-    sku: string;
-    color: string;
-    size: string;
-    stock: number;
-  }>;
-  images: Array<{ url: string; isPrimary: boolean }>;
 }
 
-type View = 'dashboard' | 'products' | 'orders' | 'analytics' | 'settings';
+type View = 'dashboard' | 'products' | 'orders' | 'analytics' | 'settings' | 'docs';
 type ProductModal = 'create' | 'edit' | 'view' | null;
 
 export default function AdminPage() {
   const user = useAtomValue(authUserAtom);
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -86,26 +65,6 @@ export default function AdminPage() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
-  const [createForm, setCreateForm] = useState<CreateProductForm>({
-    name: '',
-    basePrice: 0,
-    category: 'sunglasses',
-    brand: '',
-    description: '',
-    material: '',
-    gender: 'unisex',
-    style: '',
-    featured: false,
-    onSale: false,
-    limitedEdition: false,
-    hidden: false,
-    launchAt: '',
-    tags: '',
-    discount: { type: 'percentage', value: 0 },
-    variants: [{ sku: '', color: '', size: '', stock: 0 }],
-    images: [{ url: '', isPrimary: true }]
-  });
-
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -120,14 +79,12 @@ export default function AdminPage() {
     fetchStats();
   }, []);
 
+
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('gcg_token');
-      const res = await fetch('http://localhost:3000/api/products', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
+      const data: any = await productsApi.getAll();
       setProducts(Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -152,25 +109,25 @@ export default function AdminPage() {
     }
   };
 
-  const handleCreateProduct = async (formData: any) => {
+  const handleCreateProduct = async (formData: ProductFormData) => {
     setMessage(null);
     try {
-      const token = localStorage.getItem('gcg_token');
-      
       // First, upload any new images
       const imageUrls = [];
       for (const image of formData.images) {
-        console.log('Processing image:', image);
-        if (!image.file) {
-          // In a real implementation, you would upload the file here
-          // For now, we'll use a placeholder URL
-          imageUrls.push({
+        if (image.file) {
+           imageUrls.push({
             url: `https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=800&fit=crop&sig=${Date.now()}`,
             isPrimary: image.isPrimary || false
           });
-        } else {
-          imageUrls.push({
+        } else if (image.url) {
+           imageUrls.push({
             url: image.url,
+            isPrimary: image.isPrimary || false
+          });
+        } else {
+           imageUrls.push({
+            url: `https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=800&fit=crop&sig=${Date.now()}`,
             isPrimary: image.isPrimary || false
           });
         }
@@ -179,19 +136,11 @@ export default function AdminPage() {
       const productData = {
         ...formData,
         images: imageUrls,
-        tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []
+        tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+        launchAt: formData.launchAt || undefined
       };
       
-      const res = await fetch('http://localhost:3000/api/products', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(productData)
-      });
-      
-      if (!res.ok) throw new Error('Failed to create product');
+      await productsApi.create(productData);
       
       setMessage({ type: 'success', text: 'Product created successfully!' });
       fetchProducts();
@@ -202,73 +151,62 @@ export default function AdminPage() {
     }
   };
 
-  const resetForm = () => {
-    setCreateForm({
-      name: '',
-      basePrice: 0,
-      category: 'sunglasses',
-      brand: '',
-      description: '',
-      material: '',
-      gender: 'unisex',
-      style: '',
-      featured: false,
-      onSale: false,
-      limitedEdition: false,
-      hidden: false,
-      launchAt: '',
-      tags: '',
-      discount: { type: 'percentage', value: 0 },
-      variants: [{ sku: '', color: '', size: '', stock: 0 }],
-      images: [{ url: '', isPrimary: true }]
-    });
+  const handleUpdateProduct = async (formData: ProductFormData) => {
+    if (!selectedProduct) return;
+    setMessage(null);
+    try {
+      // Process images
+      const imageUrls = [];
+      for (const image of formData.images) {
+        if (image.file) {
+           imageUrls.push({
+            url: `https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=800&fit=crop&sig=${Date.now()}`,
+            isPrimary: image.isPrimary || false
+          });
+        } else if (image.url) {
+           imageUrls.push({
+            url: image.url,
+            isPrimary: image.isPrimary || false
+          });
+        } else {
+           imageUrls.push({
+            url: `https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=800&fit=crop&sig=${Date.now()}`,
+            isPrimary: image.isPrimary || false
+          });
+        }
+      }
+      
+      const productData = {
+        ...formData,
+        images: imageUrls,
+        tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+        launchAt: formData.launchAt || undefined
+      };
+      
+      await productsApi.update(selectedProduct._id, productData);
+
+      setMessage({ type: 'success', text: 'Product updated successfully!' });
+      fetchProducts();
+      setProductModal(null);
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+       console.error(error);
+       setMessage({ type: 'error', text: 'Failed to update product' });
+       setTimeout(() => setMessage(null), 3000);
+    }
   };
 
   const handleDeleteProduct = async (productId: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     
     try {
-      const token = localStorage.getItem('gcg_token');
-      const res = await fetch(`http://localhost:3000/api/products/${productId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (!res.ok) throw new Error('Failed to delete product');
+      await productsApi.delete(productId);
       
       setMessage({ type: 'success', text: 'Product deleted successfully' });
       fetchProducts();
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to delete product' });
     }
-  };
-
-  const addVariant = () => {
-    setCreateForm(prev => ({
-      ...prev,
-      variants: [...prev.variants, { sku: '', color: '', size: '', stock: 0 }]
-    }));
-  };
-
-  const removeVariant = (index: number) => {
-    setCreateForm(prev => ({
-      ...prev,
-      variants: prev.variants.filter((_, i) => i !== index)
-    }));
-  };
-
-  const addImage = () => {
-    setCreateForm(prev => ({
-      ...prev,
-      images: [...prev.images, { url: '', isPrimary: false }]
-    }));
-  };
-
-  const removeImage = (index: number) => {
-    setCreateForm(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
   };
 
   const filteredProducts = products.filter(product => {
@@ -286,7 +224,8 @@ export default function AdminPage() {
         { id: 'products', label: 'Products', icon: Package },
         { id: 'orders', label: 'Orders', icon: Clock },
         { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-        { id: 'settings', label: 'Settings', icon: Users }
+        { id: 'settings', label: 'Settings', icon: Users },
+        { id: 'docs', label: 'API Docs', icon: Book }
       ].map((item) => {
         const Icon = item.icon;
         return (
@@ -408,7 +347,10 @@ export default function AdminPage() {
           <p className="">Manage your product catalog</p>
         </div>
         <button
-          onClick={() => setProductModal('create')}
+          onClick={() => {
+            setSelectedProduct(null);
+            setProductModal('create');
+          }}
           className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-black transition-all hover:bg-white/90 hover:scale-105"
         >
           <Plus className="h-4 w-4" />
@@ -475,19 +417,27 @@ export default function AdminPage() {
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button
                     onClick={() => {
-                      setSelectedProduct(product);
-                      setProductModal('view');
+                      navigate(`/product/${product._id}`);
                     }}
                     className="rounded-full bg-white/20 p-2 hover:bg-white/30 transition-colors"
+                    title="View Product"
                   >
                     <Eye className="h-4 w-4" />
                   </button>
-                  <button className="rounded-full bg-white/20 p-2 hover:bg-white/30 transition-colors">
+                  <button 
+                  onClick={() => {
+                    setSelectedProduct(product);
+                    setProductModal('edit');
+                  }}
+                  className="rounded-full bg-white/20 p-2 hover:bg-white/30 transition-colors"
+                  title="Edit Product"
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product._id)}
                     className="rounded-full bg-red-500/20 p-2 hover:bg-red-500/30 transition-colors"
+                    title="Delete Product"
                   >
                     <Trash2 className="h-4 w-4 text-red-400" />
                   </button>
@@ -521,6 +471,16 @@ export default function AdminPage() {
   );
 
   // CreateProductModal replaced with DragDropProductCreator
+  const DocsView = () => (
+    <div className="h-[calc(100vh-200px)] rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+      <iframe 
+        src="/api-docs" 
+        className="w-full h-full bg-white"
+        title="API Documentation"
+      />
+    </div>
+  );
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'dashboard':
@@ -533,6 +493,8 @@ export default function AdminPage() {
         return <div className="text-center py-12"><p className="">Analytics dashboard coming soon</p></div>;
       case 'settings':
         return <div className="text-center py-12"><p className="">Settings panel coming soon</p></div>;
+      case 'docs':
+        return <DocsView />;
       default:
         return <Dashboard />;
     }
@@ -540,7 +502,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+      <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-16">
         <div className="mb-8">
           <h1 className="text-4xl font-extralight mb-2">Admin Dashboard</h1>
           <p className="">Welcome back, {user?.firstName || 'Admin'}</p>
@@ -580,13 +542,15 @@ export default function AdminPage() {
         {renderCurrentView()}
         
         <DragDropProductCreator
-          isOpen={productModal === 'create'}
+          isOpen={productModal === 'create' || productModal === 'edit'}
           onClose={() => setProductModal(null)}
-          onSubmit={handleCreateProduct}
+          onSubmit={productModal === 'edit' ? handleUpdateProduct : handleCreateProduct}
+          initialData={productModal === 'edit' && selectedProduct ? {
+            ...selectedProduct,
+            tags: selectedProduct.tags?.join(', ') || ''
+          } : undefined}
         />
       </div>
     </div>
   );
 }
-
-

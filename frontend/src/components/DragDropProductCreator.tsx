@@ -1,15 +1,15 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, 
   X, 
   Plus, 
   Trash2, 
-  Image as ImageIcon, 
   AlertCircle,
   CheckCircle,
   Loader,
-  Eye
+  Eye,
+  Link as LinkIcon
 } from 'lucide-react';
 
 interface ProductImage {
@@ -26,7 +26,7 @@ interface ProductVariant {
   stock: number;
 }
 
-interface ProductFormData {
+export interface ProductFormData {
   name: string;
   basePrice: number;
   category: string;
@@ -37,6 +37,8 @@ interface ProductFormData {
   featured: boolean;
   onSale: boolean;
   limitedEdition: boolean;
+  hidden: boolean;
+  launchAt: string;
   tags: string;
   discount: {
     type: 'percentage' | 'fixed';
@@ -70,11 +72,12 @@ export default function DragDropProductCreator({
     featured: false,
     onSale: false,
     limitedEdition: false,
+    hidden: false,
+    launchAt: '',
     tags: '',
     discount: { type: 'percentage', value: 0 },
     variants: [{ sku: '', color: '', size: '', stock: 0 }],
-    images: [],
-    ...initialData
+    images: []
   });
 
   const [dragActive, setDragActive] = useState(false);
@@ -82,7 +85,37 @@ export default function DragDropProductCreator({
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(1);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isEdit = !!initialData;
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: '',
+        basePrice: 0,
+        category: 'sunglasses',
+        brand: '',
+        description: '',
+        material: '',
+        style: '',
+        featured: false,
+        onSale: false,
+        limitedEdition: false,
+        discount: { type: 'percentage', value: 0 },
+        variants: [{ sku: '', color: '', size: '', stock: 0 }],
+        images: [],
+        ...initialData,
+        hidden: initialData?.hidden ?? false,
+        launchAt: initialData?.launchAt ?? '',
+        tags: initialData?.tags ?? ''
+      });
+      setCurrentStep(1);
+      setErrors({});
+    }
+  }, [isOpen, initialData]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -203,6 +236,34 @@ export default function DragDropProductCreator({
     }));
   };
 
+  const handleAddUrl = () => {
+    if (!urlInput.trim()) return;
+
+    // Basic URL validation
+    try {
+      new URL(urlInput);
+    } catch (e) {
+      setErrors(prev => ({ ...prev, images: 'Please enter a valid URL' }));
+      return;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, {
+        url: urlInput,
+        isPrimary: prev.images.length === 0
+      }]
+    }));
+
+    setUrlInput('');
+    setShowUrlInput(false);
+    setErrors(prev => {
+      const updated = { ...prev };
+      delete updated.images;
+      return updated;
+    });
+  };
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -224,7 +285,7 @@ export default function DragDropProductCreator({
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      setErrors({ general: 'Failed to create product' });
+      setErrors({ general: 'Failed to save product' });
     }
   };
 
@@ -325,7 +386,7 @@ export default function DragDropProductCreator({
                 </label>
                 <input
                   type="text"
-                  value={formData.material}
+                  value={formData.material || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, material: e.target.value }))}
                   className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
                   placeholder="e.g., Acetate, Metal"
@@ -338,12 +399,58 @@ export default function DragDropProductCreator({
                 </label>
                 <input
                   type="text"
-                  value={formData.style}
+                  value={formData.style || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, style: e.target.value }))}
                   className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
                   placeholder="e.g., Aviator, Wayfarer"
                 />
               </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Launch Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.launchAt ? (formData.launchAt.includes('T') ? formData.launchAt.split('T')[0] : formData.launchAt) : ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, launchAt: e.target.value }))}
+                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+                  placeholder="summer, sale, polarized"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              {[
+                { label: 'Featured', key: 'featured' },
+                { label: 'On Sale', key: 'onSale' },
+                { label: 'Limited Edition', key: 'limitedEdition' },
+                { label: 'Hidden (Draft)', key: 'hidden' }
+              ].map(({ label, key }) => (
+                <label key={key} className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData[key as keyof ProductFormData] as boolean}
+                    onChange={(e) => setFormData(prev => ({ ...prev, [key]: e.target.checked }))}
+                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                  />
+                  <span className="text-sm text-white">{label}</span>
+                </label>
+              ))}
             </div>
           </div>
         );
@@ -398,6 +505,55 @@ export default function DragDropProductCreator({
                   </p>
                 </div>
               </div>
+
+              {/* Add from URL */}
+              {!showUrlInput ? (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(true)}
+                    className="flex items-center justify-center gap-2 text-sm text-blue-400 hover:text-blue-300 w-full"
+                  >
+                    <LinkIcon className="w-4 h-4" />
+                    Or add image from URL
+                  </button>
+                </div>
+              ) : (
+                <div className="absolute inset-x-0 bottom-0 bg-black/90 p-4 border-t border-white/10 rounded-b-2xl">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddUrl();
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddUrl}
+                      className="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-600"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUrlInput(false);
+                        setUrlInput('');
+                      }}
+                      className="bg-white/10 text-white px-3 py-2 rounded-lg text-sm hover:bg-white/20"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {uploading && (
                 <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-2xl">
@@ -654,8 +810,8 @@ export default function DragDropProductCreator({
             <div className="border-b border-white/10 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-light text-white">Create New Product</h2>
-                  <p className="text-white/60">Add a new product to your catalog</p>
+                  <h2 className="text-2xl font-light text-white">{isEdit ? 'Edit Product' : 'Create New Product'}</h2>
+                  <p className="text-white/60">{isEdit ? 'Update existing product' : 'Add a new product to your catalog'}</p>
                 </div>
                 <button
                   onClick={onClose}
@@ -733,7 +889,7 @@ export default function DragDropProductCreator({
                       onClick={handleSubmit}
                       className="px-6 py-3 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
                     >
-                      Create Product
+                       {isEdit ? 'Update Product' : 'Create Product'}
                     </button>
                   )}
                 </div>

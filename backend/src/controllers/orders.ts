@@ -4,7 +4,7 @@ import { Order } from '../models/order';
 import { UserModel } from '../models/user';
 import { AuthenticatedRequest } from '../types/express';
 import { payuService } from '../utils/payuService';
-import EmailService from '../services/emailService';
+import EmailService, { emailService, OrderData } from '../services/emailService';
 
 // Validation schemas
 const createOrderSchema = z.object({
@@ -136,9 +136,9 @@ export async function createOrder(req: Request, res: Response) {
 
     const validation = createOrderSchema.safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ 
-        message: 'Invalid order data', 
-        errors: validation.error.issues 
+      return res.status(400).json({
+        message: 'Invalid order data',
+        errors: validation.error.issues
       });
     }
 
@@ -183,7 +183,7 @@ export async function createOrder(req: Request, res: Response) {
       productInfo: `GCG Eyewear Order - ${order.items.length} items`,
       customerName: `${user.firstName} ${user.lastName}`,
       customerEmail: user.email,
-      customerPhone: req.body.phone || user.phone || '9999999999',
+      customerPhone: req.body.phone || '9999999999',
       successUrl: `http://localhost:3000/api/orders/payment/callback/`,
       failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/checkout/failure/`,
     });
@@ -209,8 +209,6 @@ export async function createOrder(req: Request, res: Response) {
  */
 export async function handlePaymentResponse(req: Request, res: Response) {
   try {
-    const emailService = new EmailService();
-
     // Parse payment response
     const paymentResponse = payuService.parsePaymentResponse(req.body);
 
@@ -222,7 +220,9 @@ export async function handlePaymentResponse(req: Request, res: Response) {
 
     // Find order using UDF1 (orderId)
     const orderId = paymentResponse.udf1;
-    const order = await Order.findById(orderId).populate('user', 'firstName lastName email phone');
+    const order = await Order.findById(orderId)
+      .populate('user', 'firstName lastName email phone')
+      .populate('items.product', 'name images');
     if (!order) {
       console.error('Order not found:', orderId);
       return res.status(404).json({ message: 'Order not found' });
@@ -232,11 +232,11 @@ export async function handlePaymentResponse(req: Request, res: Response) {
     // Ensure both values are numbers before comparison
     const expectedAmount = typeof order.total === 'number' ? order.total : parseFloat(String(order.total));
     const receivedAmount = typeof paymentResponse.amount === 'number' ? paymentResponse.amount : parseFloat(String(paymentResponse.amount));
-    
+
     if (!payuService.validatePaymentAmount(expectedAmount, receivedAmount)) {
-      console.error('Payment amount mismatch:', { 
-        expected: expectedAmount, 
-        received: receivedAmount 
+      console.error('Payment amount mismatch:', {
+        expected: expectedAmount,
+        received: receivedAmount
       });
       return res.status(400).json({ message: 'Payment amount mismatch' });
     }
@@ -249,8 +249,26 @@ export async function handlePaymentResponse(req: Request, res: Response) {
       order.payment.gatewayResponse = paymentResponse;
       order.status = 'confirmed';
 
+      // Transform to OrderData for email service
+      const userData = order.user as any;
+      const emailOrderData: OrderData = {
+        orderNumber: (order as any).orderNumber || `ORD-${order._id.toString().slice(-8).toUpperCase()}`,
+        customerName: `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim() || 'Customer',
+        items: order.items.map((item: any) => ({
+          name: item.product?.name || 'Product',
+          quantity: item.quantity,
+          price: item.price,
+          image: item.product?.images?.[0]
+        })),
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shippingCost,
+        total: order.total,
+        shippingAddress: order.shippingAddress,
+      };
+
       // Send order confirmation email
-      await emailService.sendOrderConfirmation(order.user?.email.toString(), order);
+      await emailService.sendOrderConfirmation(userData?.email, emailOrderData);
     } else {
       order.payment.status = 'failed';
       order.payment.gatewayResponse = paymentResponse;
@@ -266,8 +284,8 @@ export async function handlePaymentResponse(req: Request, res: Response) {
         success: payuService.isPaymentSuccessful(paymentResponse),
         orderId: order._id.toString(),
         order,
-        message: payuService.isPaymentSuccessful(paymentResponse) 
-          ? 'Payment successful' 
+        message: payuService.isPaymentSuccessful(paymentResponse)
+          ? 'Payment successful'
           : payuService.getFailureReason(paymentResponse)
       });
     } else {
@@ -291,7 +309,6 @@ export async function handlePaymentResponse(req: Request, res: Response) {
  */
 export async function updateOrderStatus(req: Request, res: Response) {
   try {
-    const emailService = new EmailService();
     const authenticatedReq = req as AuthenticatedRequest;
     if (!authenticatedReq.user) {
       return res.status(401).json({ message: 'Unauthorized' });
@@ -304,16 +321,16 @@ export async function updateOrderStatus(req: Request, res: Response) {
 
     const validation = updateOrderStatusSchema.safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ 
-        message: 'Invalid status data', 
-        errors: validation.error.issues 
+      return res.status(400).json({
+        message: 'Invalid status data',
+        errors: validation.error.issues
       });
     }
 
     const orderId = req.params.id;
     const { status, notes } = validation.data;
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('user', 'firstName lastName email');
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
@@ -326,11 +343,17 @@ export async function updateOrderStatus(req: Request, res: Response) {
     await order.save();
 
     // Send status update email to customer
-    await emailService.sendOrderStatusUpdate(authenticatedReq.user.email, order);
+    const userData = order.user as any;
+    const statusData = {
+      customerName: `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim() || 'Customer',
+      orderNumber: (order as any).orderNumber || `ORD-${order._id.toString().slice(-8).toUpperCase()}`,
+      status: order.status,
+    };
+    await emailService.sendOrderStatusUpdate(userData?.email, statusData);
 
-    res.json({ 
+    res.json({
       message: 'Order status updated successfully',
-      order 
+      order
     });
   } catch (error) {
     console.error('Update order status error:', error);
@@ -363,8 +386,8 @@ export async function cancelOrder(req: Request, res: Response) {
 
     // Check if order can be cancelled
     if (['shipped', 'delivered'].includes(order.status)) {
-      return res.status(400).json({ 
-        message: 'Cannot cancel order that has been shipped or delivered' 
+      return res.status(400).json({
+        message: 'Cannot cancel order that has been shipped or delivered'
       });
     }
 
@@ -376,9 +399,9 @@ export async function cancelOrder(req: Request, res: Response) {
 
     await order.save();
 
-    res.json({ 
+    res.json({
       message: 'Order cancelled successfully',
-      order 
+      order
     });
   } catch (error) {
     console.error('Cancel order error:', error);

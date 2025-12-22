@@ -22,7 +22,7 @@ export const showToastAtom = atom(
       message: payload.message,
       type: payload.type,
     });
-    
+
     // Auto-hide toast after 3 seconds
     setTimeout(() => {
       set(toastAtom, (prev) => ({ ...prev, show: false }));
@@ -64,27 +64,4 @@ export const toggleFilterDrawerAtom = atom(
   }
 );
 
-// Theme state
-export const themeAtom = atom<'light' | 'dark'>('light');
 
-// Load theme from localStorage on initialization
-const loadTheme = () => {
-  try {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    return savedTheme || 'light';
-  } catch {
-    return 'light';
-  }
-};
-
-export const themeAtomWithPersistence = atom(
-  loadTheme(),
-  (get, set, newTheme: 'light' | 'dark') => {
-    set(themeAtom, newTheme);
-    try {
-      localStorage.setItem('theme', newTheme);
-    } catch {
-      // Ignore localStorage errors
-    }
-  }
-);

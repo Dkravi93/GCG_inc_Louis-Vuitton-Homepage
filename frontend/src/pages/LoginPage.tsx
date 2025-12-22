@@ -17,7 +17,7 @@ export default function LoginPage() {
       setLoading(true);
       setError(null);
       const response = await apiUtils.post<AuthResponse>('/auth/login', { email, password });
-      setAuth({ token: response.token, user: response.user });
+      setAuth({ user: response.user });
       navigate("/");
     } catch (err: any) {
       setError(err.message || 'Failed to login');

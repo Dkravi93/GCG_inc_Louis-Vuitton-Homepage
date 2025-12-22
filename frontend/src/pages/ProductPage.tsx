@@ -139,7 +139,7 @@ export default function ProductPage() {
   if (loading) {
     return (
       <div className="max-h-screen bg-black">
-        <div className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-20">
           <div className="animate-pulse">
             <div className="mb-8">
               <div className="h-4 w-24 bg-white/10 rounded mb-4"></div>
@@ -195,7 +195,7 @@ export default function ProductPage() {
       
       <div className="min-h-screen">
         {/* Breadcrumb & Back Navigation */}
-        <div className="mx-auto max-w-7xl px-6 py-8  mt-16">
+        <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-8  mt-16">
           <div className="flex items-center gap-4 text-sm">
             <Link to="/collections" className="flex items-center gap-2 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
@@ -208,7 +208,7 @@ export default function ProductPage() {
           </div>
         </div>
 
-        <main className="mx-auto max-w-7xl px-6 pb-20">
+        <main className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 pb-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Product Images */}
             <div>

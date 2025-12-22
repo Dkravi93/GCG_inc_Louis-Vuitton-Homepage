@@ -199,7 +199,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+      <div className="mx-auto max-w-[90%] 2xl:max-w-screen-2xl px-6 py-16">
         {/* Progress Steps */}
         <div className="mb-12">
           <div className="flex items-center justify-center space-x-8">
